@@ -1,15 +1,26 @@
+@file:Suppress("OPT_IN_IS_NOT_ENABLED")
+
 package com.example.zpi_mobile
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import com.example.zpi_mobile.ui.theme.ZPIMobileTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,22 +33,104 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    StartScreen()
                 }
             }
         }
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+fun StartScreen() {
+    Scaffold(
+//        topBar = {
+//            CenterAlignedTopAppBar(
+//                title = { Text(text = "Programy studiów", color = Color.Black) },
+//                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xff0f9d58)),
+//            )
+//        },
+        content = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(0.dp, 50.dp)
+            ) {
+                Column {
+                    StartProgramChoice(text = "Wybierz stopień studiów", visibility = true)
+                    StartProgramChoice(text = "Wybierz kierunek studiów")
+                    StartProgramChoice(text = "Wybierz cykl kształcenia")
+                    StartProgramChoice(text = "Wybierz specjalność")
+                }
+            }
+        }
+    )
 }
+
+@Composable
+fun StartProgramChoice(
+    text: String = "M",
+    visibility: Boolean = false,
+    possibilities: List<String> = listOf("IST", "IST - ang.", "IS", "IZ", "Z")
+) {
+    if (visibility) {
+        var selectedText by remember { mutableStateOf("") }
+        var expanded by remember { mutableStateOf(false) }
+        val icon = if (expanded) {
+            Icons.Filled.KeyboardArrowUp
+        } else {
+            Icons.Filled.KeyboardArrowDown
+        }
+        var outlineTextFieldSize by remember { mutableStateOf(Size.Zero) }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+            OutlinedTextField(
+                value = selectedText,
+                onValueChange = { selectedText = it },
+                label = { Text(text) },
+                modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
+                    outlineTextFieldSize = layoutCoordinates.size.toSize()
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = "Expand",
+                        modifier = Modifier.clickable { expanded = !expanded }
+                    )
+                }
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.width(
+                    with(LocalDensity.current) {
+                        outlineTextFieldSize.width.toDp()
+                    }
+                )
+            ) {
+                possibilities.forEach { possibility ->
+                    DropdownMenuItem(
+                        text = { Text(possibility) },
+                        onClick = {
+                            selectedText = possibility
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    ZPIMobileTheme {
-        Greeting("Android")
-    }
+    ZPIMobileTheme {}
 }
