@@ -53,6 +53,13 @@ class MainActivity : ComponentActivity() {
         sharedPreferencesManager.saveData("cycle", "")
         sharedPreferencesManager.saveData("specialization", "")
 
+        val start = Start()
+        val levels = start.getLevels()
+        var fields = remember { mutableStateListOf<String>() }
+        var cycles = remember { mutableStateListOf<String>() }
+        var specializations = remember { mutableStateListOf<String>() }
+
+
         Scaffold(
 //        topBar = {
 //            CenterAlignedTopAppBar(
@@ -70,6 +77,7 @@ class MainActivity : ComponentActivity() {
                         StartProgramChoice(
                             text = "Wybierz stopień studiów",
                             visibility = true,
+                            possibilities = levels,
                             key = "level",
                             onClick = {
                                 visible2 = true
@@ -78,31 +86,37 @@ class MainActivity : ComponentActivity() {
                                 sharedPreferencesManager.saveData("field", "")
                                 sharedPreferencesManager.saveData("cycle", "")
                                 sharedPreferencesManager.saveData("specialization", "")
+                                fields = start.getFields()
                             }
                         )
                         StartProgramChoice(
                             text = "Wybierz kierunek studiów",
                             visibility = visible2,
+                            possibilities = fields,
                             key = "field",
                             onClick = {
                                 visible3 = true
                                 visible4 = false
                                 sharedPreferencesManager.saveData("cycle", "")
                                 sharedPreferencesManager.saveData("specialization", "")
+                                cycles = start.getCycles()
                             }
                         )
                         StartProgramChoice(
                             text = "Wybierz cykl kształcenia",
                             visibility = visible3,
+                            possibilities = cycles,
                             key = "cycle",
                             onClick = {
                                 visible4 = true
                                 sharedPreferencesManager.saveData("specialization", "")
+                                specializations = start.getSpecializations()
                             }
                         )
                         StartProgramChoice(
                             text = "Wybierz specjalność",
                             visibility = visible4,
+                            possibilities = specializations,
                             key = "specialization",
                             onClick = {
 
@@ -118,7 +132,7 @@ class MainActivity : ComponentActivity() {
     fun StartProgramChoice(
         text: String,
         visibility: Boolean? = false,
-        possibilities: List<String> = listOf("IST", "IST - ang.", "IS", "IZ", "Z"),
+        possibilities: List<String>,
         key: String,
         onClick: () -> Unit
     ) {
