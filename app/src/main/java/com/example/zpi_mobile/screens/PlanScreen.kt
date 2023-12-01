@@ -2,15 +2,24 @@
 
 package com.example.zpi_mobile.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import android.annotation.SuppressLint
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 
-@OptIn(ExperimentalPagerApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PlanScreen() {
     val semesters = listOf(
@@ -24,13 +33,67 @@ fun PlanScreen() {
         "Semestr 7."
     )
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        HorizontalPager(
-            count = semesters.size,
-            modifier = Modifier.fillMaxSize()
+    Column() {
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            index -> Text(text = semesters[index])
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Green)
+                    .padding(0.dp, 15.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Informatyka Stosowana",
+                    color = Color.Black,
+                    fontSize = 32.sp
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Color.Gray)
+                    .padding(0.dp, 15.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowLeft,
+                            contentDescription = "left"
+                        )
+                    }
+                    Text(
+                        text = "Wszystko",
+                        fontSize = 24.sp
+                    )
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowRight,
+                            contentDescription = "right"
+                        )
+                    }
+                }
+            }
+
         }
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            HorizontalPager(
+                count = semesters.size,
+                modifier = Modifier.fillMaxSize()
+            ) { index ->
+                Text(text = semesters[index])
+            }
+        }
+
     }
+
 
 }
