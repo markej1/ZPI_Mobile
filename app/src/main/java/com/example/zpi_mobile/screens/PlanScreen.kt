@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.zpi_mobile.services.SubjectService
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -114,11 +115,20 @@ fun PlanScreen() {
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { index ->
-                Text(text = semesters[index])
+                when (index) {
+                    0 -> PlanViewAll()
+                }
             }
         }
 
     }
 
+}
 
+@Composable
+fun PlanViewAll() {
+    val subjectService = SubjectService()
+    Box() {
+        Text(subjectService.getBlocks()[0].name)
+    }
 }
