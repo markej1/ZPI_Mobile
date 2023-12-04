@@ -5,6 +5,8 @@ package com.example.zpi_mobile.screens
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -13,8 +15,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.zpi_mobile.model.Block
 import com.example.zpi_mobile.services.SubjectService
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -109,15 +113,13 @@ fun PlanScreen() {
 
         }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            HorizontalPager(
-                count = semesters.size,
-                state = pagerState,
-                modifier = Modifier.fillMaxSize()
-            ) { index ->
-                when (index) {
-                    0 -> PlanViewAll()
-                }
+        HorizontalPager(
+            count = semesters.size,
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { index ->
+            when (index) {
+                0 -> PlanViewAll()
             }
         }
 
@@ -125,10 +127,41 @@ fun PlanScreen() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanViewAll() {
     val subjectService = SubjectService()
-    Box() {
-        Text(subjectService.getBlocks()[0].name)
+    val subjects: List<Block> = subjectService.getBlocks()
+    Box(contentAlignment = Alignment.TopCenter) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 128.dp),
+        ) {
+            items(subjects.size) { index ->
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Blue
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .heightIn(min = 120.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = subjects[index].name,
+                            maxLines = 4,
+                            modifier = Modifier.padding(8.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
     }
 }
