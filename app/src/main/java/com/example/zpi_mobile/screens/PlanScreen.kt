@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import com.example.zpi_mobile.model.Block
 import com.example.zpi_mobile.services.SubjectService
@@ -112,42 +113,88 @@ fun PlanScreen() {
             }
 
         }
-
-
         HorizontalPager(
             count = semesters.size,
             state = pagerState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.TopCenter)
         ) { index ->
             when (index) {
                 0 -> PlanViewAll()
+                else -> PlanViewSemester()
             }
         }
-
     }
-
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SubjectTile() {
-    ElevatedCard(
-        onClick = {},
-        colors = CardDefaults.cardColors(containerColor = Color.Green),
-        modifier = Modifier
-            .padding(all = 10.dp)
-            .width(100.dp)
+fun PlanViewSemester() {
+    val subjectService = SubjectService()
+    val subjects: List<Block> = subjectService.getBlocks()
+    Box(contentAlignment = Alignment.TopCenter) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 128.dp),
+        ) {
+            items(subjects.size) { index ->
+                Card(
+                    onClick = {},
+                    colors = CardDefaults.cardColors(
+                            containerColor = Color.Yellow
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .heightIn(min = 120.dp, max = 120.dp),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp).padding(top = 8.dp)
+                                .fillMaxWidth()
+                                .wrapContentWidth()
+                        ){
+                            Text(
+                                text = subjects[index].ects + " ECTS",
+                                textAlign = TextAlign.Start,
+                                modifier = Modifier
 
-    ) {
-        Text(
-            text = "Aplikacje mobilne na platformę android",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(all = 10.dp)
-        )
+                            )
+                            Text(
+                                text = subjects[index].exam,
+                                textAlign = TextAlign.End,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentWidth(align = Alignment.End)
+                            )
+                        }
+                        Text(
+                            text = subjects[index].name,
+                            maxLines = 4,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .fillMaxWidth()
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                        )
+                        Text(
+                            text = subjects[index].hours,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .wrapContentSize(Alignment.BottomCenter)
+                                .padding(bottom = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
     }
-
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -186,4 +233,4 @@ fun PlanViewAll() {
             }
         }
     }
-}}
+}

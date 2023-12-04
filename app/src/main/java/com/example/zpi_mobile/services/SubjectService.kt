@@ -57,7 +57,7 @@ class SubjectService {
                 name = "Analiza matematyczna I",
                 hours = "21000",
                 ects = "5",
-                exam = "",
+                exam = "E",
                 block_type = "przedmiot kierunkowy",
                 subjects = listOf(
                     Subject(
