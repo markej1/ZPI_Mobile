@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import com.example.zpi_mobile.model.Block
 import com.example.zpi_mobile.services.SubjectService
@@ -116,7 +115,8 @@ fun PlanScreen() {
         HorizontalPager(
             count = semesters.size,
             state = pagerState,
-            modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.TopCenter)
+            verticalAlignment = Alignment.Top,
+            modifier = Modifier.wrapContentHeight().fillMaxSize()
         ) { index ->
             when (index) {
                 0 -> PlanViewAll()
