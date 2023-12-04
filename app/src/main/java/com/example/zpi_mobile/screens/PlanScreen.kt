@@ -116,8 +116,7 @@ fun PlanScreen() {
         HorizontalPager(
             count = semesters.size,
             state = pagerState,
-            verticalAlignment = Alignment.Top,
-            modifier = Modifier.wrapContentHeight().fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) { index ->
             when (index) {
                 0 -> PlanViewAll()
