@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -89,11 +90,39 @@ fun PlanScreen() {
                 count = semesters.size,
                 modifier = Modifier.fillMaxSize()
             ) { index ->
-                Text(text = semesters[index])
+                //                Text(text = semesters[index])
+                Column {
+                    Row {
+                        SubjectTile()
+                        SubjectTile()
+                        SubjectTile()
+                    }
+                }
             }
         }
 
     }
 
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SubjectTile() {
+    ElevatedCard(
+        onClick = {},
+        colors = CardDefaults.cardColors(containerColor = Color.Green),
+        modifier = Modifier
+            .padding(all = 10.dp)
+            .width(100.dp)
+
+    ) {
+        Text(
+            text = "Aplikacje mobilne na platformę android",
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(all = 10.dp)
+        )
+    }
 
 }
