@@ -5,22 +5,28 @@ package com.example.zpi_mobile.screens
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.zpi_mobile.model.Block
+import com.example.zpi_mobile.services.SubjectService
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun PlanScreen() {
     val semesters = listOf(
@@ -33,6 +39,10 @@ fun PlanScreen() {
         "Semestr 6.",
         "Semestr 7."
     )
+
+    val pagerState = rememberPagerState()
+    val semester = semesters[pagerState.currentPage]
+    val scope = rememberCoroutineScope()
 
     Column() {
 
@@ -64,47 +74,60 @@ fun PlanScreen() {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowLeft,
-                            contentDescription = "left"
-                        )
+                    IconButton(
+                        enabled = pagerState.currentPage != 0,
+                        onClick = {
+                            scope.launch {
+                                pagerState.scrollToPage(pagerState.currentPage - 1)
+                            }
+                        }
+                    ) {
+                        if (pagerState.currentPage != 0) {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowLeft,
+                                contentDescription = "left"
+                            )
+                        }
                     }
                     Text(
-                        text = "Wszystko",
+                        text = semester,
                         fontSize = 24.sp
                     )
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowRight,
-                            contentDescription = "right"
-                        )
+                    IconButton(
+                        enabled = pagerState.currentPage != semesters.size - 1,
+                        onClick = {
+                            scope.launch {
+                                pagerState.scrollToPage(pagerState.currentPage + 1)
+                            }
+                        }
+                    ) {
+                        if (pagerState.currentPage != semesters.size - 1) {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowRight,
+                                contentDescription = "right"
+                            )
+                        }
                     }
                 }
             }
 
         }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            HorizontalPager(
-                count = semesters.size,
-                modifier = Modifier.fillMaxSize()
-            ) { index ->
-                //                Text(text = semesters[index])
-                Column {
-                    Row {
-                        SubjectTile()
-                        SubjectTile()
-                        SubjectTile()
-                    }
-                }
+
+        HorizontalPager(
+            count = semesters.size,
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { index ->
+            when (index) {
+                0 -> PlanViewAll()
             }
         }
 
     }
 
-
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,4 +148,42 @@ fun SubjectTile() {
         )
     }
 
-}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PlanViewAll() {
+    val subjectService = SubjectService()
+    val subjects: List<Block> = subjectService.getBlocks()
+    Box(contentAlignment = Alignment.TopCenter) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 128.dp),
+        ) {
+            items(subjects.size) { index ->
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Blue
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .heightIn(min = 120.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = subjects[index].name,
+                            maxLines = 4,
+                            modifier = Modifier.padding(8.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+    }
+}}
