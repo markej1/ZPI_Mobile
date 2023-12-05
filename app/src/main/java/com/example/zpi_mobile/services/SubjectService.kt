@@ -1,8 +1,12 @@
 package com.example.zpi_mobile.services
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
 import com.example.zpi_mobile.model.*
 
-class SubjectService {
+class SubjectService: ViewModel() {
 
     fun getBlocks(): List<Block> {
         val blocks: List<Block> = listOf(
@@ -292,4 +296,12 @@ class SubjectService {
         return blocks
     }
 
+    var isDialogShown by mutableStateOf(false)
+        private set
+    fun showDialog() {
+        isDialogShown = true
+    }
+    fun dismissDialog() {
+        isDialogShown = false
+    }
 }
