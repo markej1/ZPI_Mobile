@@ -3,7 +3,6 @@
 package com.example.zpi_mobile.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,12 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.zpi_mobile.R
+import androidx.compose.ui.window.DialogProperties
 import com.example.zpi_mobile.model.Block
 import com.example.zpi_mobile.services.SubjectService
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -146,27 +144,29 @@ fun PlanScreen(
                         .fillMaxSize()
                 ) { index ->
                     when (index) {
-                        0 -> PlanViewAll()
+                        0 -> PlanViewAll(subjectService)
                         else -> PlanViewSemester(subjectService)
                     }
                 }
             }
         }
-
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubjectTile(
-    index: Int,
+    isInSelectDialog: Boolean,
+    id: Int,
+    block: Block,
     subjectService: SubjectService
 ) {
     val subjects: List<Block> = subjectService.getBlocks()
     
     Card(
-        onClick = { subjectService.showDialog()
-            Log.d("MainActivity", "wattosc: " + subjectService.isDialogShown.toString())
+        onClick = {
+            subjectService.showDialog(block)
+            subjectService.chooseBlock(block)
                   },
         colors = CardDefaults.cardColors(
             containerColor = Color.Yellow
@@ -190,12 +190,12 @@ fun SubjectTile(
                     .wrapContentWidth()
             ){
                 Text(
-                    text = subjects[index].ects + " ECTS",
+                    text = block.ects + " ECTS",
                     textAlign = TextAlign.Start,
                     modifier = Modifier
                 )
                 Text(
-                    text = subjects[index].exam,
+                    text = block.exam,
                     textAlign = TextAlign.End,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -203,7 +203,7 @@ fun SubjectTile(
                 )
             }
             Text(
-                text = subjects[index].name,
+                text = if(!isInSelectDialog) block.name else block.subjects[id].name,
                 maxLines = 4,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -212,7 +212,7 @@ fun SubjectTile(
                     .wrapContentWidth(Alignment.CenterHorizontally)
             )
             Text(
-                text = subjects[index].hours,
+                text = block.hours,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxSize()
@@ -233,7 +233,7 @@ fun PlanViewSemester(
             columns = GridCells.Adaptive(minSize = 128.dp),
         ) {
             items(subjects.size) { index ->
-               SubjectTile(index = index, subjectService)
+               SubjectTile(false, 0, subjects[index], subjectService)
             }
         }
     }
@@ -241,8 +241,9 @@ fun PlanViewSemester(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlanViewAll() {
-    val subjectService = SubjectService()
+fun PlanViewAll(
+    subjectService: SubjectService
+) {
     val subjects: List<Block> = subjectService.getBlocks()
     Box(contentAlignment = Alignment.TopCenter) {
         LazyVerticalGrid(
@@ -250,6 +251,10 @@ fun PlanViewAll() {
         ) {
             items(subjects.size) { index ->
                 Card(
+                    onClick = {
+                        subjectService.showDialog(subjects[index])
+                        subjectService.chooseBlock(subjects[index])
+                              },
                     colors = CardDefaults.cardColors(
                         containerColor = Color.Blue
                     ),
@@ -283,8 +288,12 @@ fun PlanViewAll() {
 fun SubjectSelect(
     subjectService: SubjectService
 ) {
+    val clickedBlock = subjectService.clickedBlock
+    val subjects = clickedBlock?.subjects
+
     Dialog(
-        onDismissRequest = { subjectService.dismissDialog() }
+        onDismissRequest = { subjectService.dismissDialog() },
+        properties = DialogProperties(dismissOnClickOutside = true)
     ) {
         Card(
             modifier = Modifier
@@ -293,8 +302,10 @@ fun SubjectSelect(
                 .padding(8.dp)
         ) {
             LazyColumn {
-                items(3) {index ->
-                    SubjectTile(index = index, subjectService)
+                subjects?.size?.let {
+                    items(it) { index ->
+                        SubjectTile(true, index, clickedBlock, subjectService)
+                    }
                 }
             }
         }

@@ -54,6 +54,44 @@ class SubjectService: ViewModel() {
                             CNPS = "",
                             crediting = ""
                         )
+                    ),
+                    Subject(
+                        id = 1,
+                        name = "Sieci komputerowe",
+                        lecture = Lecture(
+                            ECTS = "3",
+                            ZZU = "30",
+                            CNPS = "90",
+                            crediting = ""
+                        ),
+                        classes = Classes(
+                            ECTS = "2",
+                            ZZU = "15",
+                            CNPS = "45",
+                            crediting = ""
+                        ),
+                        group_of_courses = "NIE",
+                        programme_content = listOf(),
+                        kind_of_subject = "Obowiązkowy",
+                        link = "",
+                        project = Project(
+                            ECTS = "",
+                            ZZU = "",
+                            CNPS = "",
+                            crediting = ""
+                        ),
+                        seminar = Seminar(
+                            ECTS = "",
+                            ZZU = "",
+                            CNPS = "",
+                            crediting = ""
+                        ),
+                        laboratory = Laboratory(
+                            ECTS = "",
+                            ZZU = "",
+                            CNPS = "",
+                            crediting = ""
+                        )
                     )
                 )
             ),
@@ -67,6 +105,82 @@ class SubjectService: ViewModel() {
                     Subject(
                         id = 1,
                         name = "Organizacja Systemów Komputerowych",
+                        lecture = Lecture(
+                            ECTS = "3",
+                            ZZU = "30",
+                            CNPS = "90",
+                            crediting = ""
+                        ),
+                        classes = Classes(
+                            ECTS = "2",
+                            ZZU = "15",
+                            CNPS = "45",
+                            crediting = ""
+                        ),
+                        group_of_courses = "NIE",
+                        programme_content = listOf(),
+                        kind_of_subject = "Obowiązkowy",
+                        link = "",
+                        project = Project(
+                            ECTS = "",
+                            ZZU = "",
+                            CNPS = "",
+                            crediting = ""
+                        ),
+                        seminar = Seminar(
+                            ECTS = "",
+                            ZZU = "",
+                            CNPS = "",
+                            crediting = ""
+                        ),
+                        laboratory = Laboratory(
+                            ECTS = "",
+                            ZZU = "",
+                            CNPS = "",
+                            crediting = ""
+                        )
+                    ),
+                    Subject(
+                        id = 1,
+                        name = "Sieci komputerowe",
+                        lecture = Lecture(
+                            ECTS = "3",
+                            ZZU = "30",
+                            CNPS = "90",
+                            crediting = ""
+                        ),
+                        classes = Classes(
+                            ECTS = "2",
+                            ZZU = "15",
+                            CNPS = "45",
+                            crediting = ""
+                        ),
+                        group_of_courses = "NIE",
+                        programme_content = listOf(),
+                        kind_of_subject = "Obowiązkowy",
+                        link = "",
+                        project = Project(
+                            ECTS = "",
+                            ZZU = "",
+                            CNPS = "",
+                            crediting = ""
+                        ),
+                        seminar = Seminar(
+                            ECTS = "",
+                            ZZU = "",
+                            CNPS = "",
+                            crediting = ""
+                        ),
+                        laboratory = Laboratory(
+                            ECTS = "",
+                            ZZU = "",
+                            CNPS = "",
+                            crediting = ""
+                        )
+                    ),
+                    Subject(
+                        id = 1,
+                        name = "Bazy danych",
                         lecture = Lecture(
                             ECTS = "3",
                             ZZU = "30",
@@ -298,10 +412,20 @@ class SubjectService: ViewModel() {
 
     var isDialogShown by mutableStateOf(false)
         private set
-    fun showDialog() {
-        isDialogShown = true
+    fun showDialog(block: Block) {
+        if(block.subjects.size > 1) {
+            isDialogShown = true
+        }
     }
     fun dismissDialog() {
         isDialogShown = false
     }
+
+    var clickedBlock by mutableStateOf<Block?>(null)
+        private set
+    fun chooseBlock(block: Block) {
+        clickedBlock = block
+    }
+
+
 }
