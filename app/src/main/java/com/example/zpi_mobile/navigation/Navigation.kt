@@ -14,7 +14,13 @@ fun Navigation() {
             StartScreen(navController = navController)
         }
         composable(route = Screen.MenuScreen.route) {
-            MenuScreen()
+            MenuScreen(navController = navController)
+        }
+        composable(route = Screen.PlanScreen.route) {
+            PlanScreen(navController = navController)
+        }
+        composable(route = Screen.HelpScreen.route) {
+            HelpScreen()
         }
     }
 }

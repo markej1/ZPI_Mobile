@@ -13,12 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import com.example.zpi_mobile.SharedPreferencesManager
+import com.example.zpi_mobile.navigation.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuScreen() {
+fun MenuScreen(navController: NavController) {
     val sharedPreferencesManager = SharedPreferencesManager(LocalContext.current)
     val level = sharedPreferencesManager.getData("level", "")
     val field = sharedPreferencesManager.getData("field", "")
@@ -59,7 +61,9 @@ fun MenuScreen() {
                             }
                         }
                     }
-                    Button(onClick = {}) {
+                    Button(onClick = {
+                        navController.navigate(Screen.PlanScreen.route)
+                    }) {
                         Text(text = "Plan studiów")
                     }
                 }
