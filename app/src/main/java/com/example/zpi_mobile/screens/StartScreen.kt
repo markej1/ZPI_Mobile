@@ -111,6 +111,7 @@ fun StartScreen(navController: NavController) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StartProgramChoice(
     text: String,
@@ -129,46 +130,53 @@ fun StartProgramChoice(
         }
         var outlineTextFieldSize by remember { mutableStateOf(Size.Zero) }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        ) {
-            OutlinedTextField(
-                value = sharedPreferencesManager.getData(key, ""),
-                onValueChange = {
-                    sharedPreferencesManager.saveData(key, it)
-                },
-                label = { Text(text) },
-                modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
-                    outlineTextFieldSize = layoutCoordinates.size.toSize()
-                },
-                trailingIcon = {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = "Expand",
-                        modifier = Modifier.clickable { expanded = !expanded }
-                    )
-                }
-            )
-            DropdownMenu(
+        Box {
+            ExposedDropdownMenuBox(
                 expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.width(
-                    with(LocalDensity.current) {
-                        outlineTextFieldSize.width.toDp()
-                    }
-                )
+                onExpandedChange = { expanded = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)
             ) {
-                possibilities.forEach { possibility ->
-                    DropdownMenuItem(
-                        text = { Text(possibility) },
-                        onClick = {
-                            sharedPreferencesManager.saveData(key, possibility)
-                            expanded = false
-                            onClick()
+                OutlinedTextField(
+                    value = sharedPreferencesManager.getData(key, ""),
+                    onValueChange = {
+                        sharedPreferencesManager.saveData(key, it)
+                    },
+                    label = { Text(text) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onGloballyPositioned { coordinates ->
+                            outlineTextFieldSize = coordinates.size.toSize()
+                        },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = "Expand",
+                            modifier = Modifier.clickable { expanded = !expanded }
+                        )
+                    },
+                    readOnly = true
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.width(
+                        with(LocalDensity.current) {
+                            outlineTextFieldSize.width.toDp()
                         }
                     )
+                ) {
+                    possibilities.forEach { possibility ->
+                        DropdownMenuItem(
+                            text = { Text(possibility) },
+                            onClick = {
+                                sharedPreferencesManager.saveData(key, possibility)
+                                expanded = false
+                                onClick()
+                            }
+                        )
+                    }
                 }
             }
         }
