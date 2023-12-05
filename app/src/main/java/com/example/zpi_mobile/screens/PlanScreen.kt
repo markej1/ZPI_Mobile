@@ -20,8 +20,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.zpi_mobile.R
 import com.example.zpi_mobile.model.Block
+import com.example.zpi_mobile.navigation.Screen
 import com.example.zpi_mobile.services.SubjectService
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -31,7 +33,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun PlanScreen() {
+fun PlanScreen(navController: NavController) {
     val semesters = listOf(
         "Wszystko",
         "Semestr 1.",
@@ -50,7 +52,7 @@ fun PlanScreen() {
     Scaffold(
         floatingActionButton = {
             SmallFloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = { navController.navigate(Screen.HelpScreen.route) },
                 shape = CircleShape,
                 modifier = Modifier.size(75.dp)
             ) {
@@ -126,7 +128,7 @@ fun PlanScreen() {
                     }
                 }
             }
-            Box() {
+            Box {
                 HorizontalPager(
                     count = semesters.size,
                     state = pagerState,
