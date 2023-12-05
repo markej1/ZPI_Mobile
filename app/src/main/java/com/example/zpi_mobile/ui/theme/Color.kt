@@ -18,3 +18,5 @@ val blokSpecjalnosciowy = Color(0xFFFF675E)
 val blokKsztalceniaOgolnego = Color(0xFF4DA524)
 val blokKierunkowy = Color(0xFFDCB142)
 val blokNaukPodstawowych = Color(0xFF1494BC)
+
+val StartBackgroundColor = Color(0xFFEDE5E2)
