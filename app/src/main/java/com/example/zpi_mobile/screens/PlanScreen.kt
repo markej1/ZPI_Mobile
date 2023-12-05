@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -15,9 +16,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.zpi_mobile.R
 import com.example.zpi_mobile.model.Block
 import com.example.zpi_mobile.services.SubjectService
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -26,7 +29,7 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PlanScreen() {
     val semesters = listOf(
@@ -44,7 +47,20 @@ fun PlanScreen() {
     val semester = semesters[pagerState.currentPage]
     val scope = rememberCoroutineScope()
 
-    Column() {
+    Scaffold(
+        floatingActionButton = {
+            SmallFloatingActionButton(
+                onClick = { /*TODO*/ },
+                shape = CircleShape,
+                modifier = Modifier.size(75.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.question_mark),
+                    contentDescription = "question_mark"
+                )
+            }
+        }
+    ) {
 
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -110,19 +126,23 @@ fun PlanScreen() {
                     }
                 }
             }
-
-        }
-        HorizontalPager(
-            count = semesters.size,
-            state = pagerState,
-            verticalAlignment = Alignment.Top,
-            modifier = Modifier.wrapContentHeight().fillMaxSize()
-        ) { index ->
-            when (index) {
-                0 -> PlanViewAll()
-                else -> PlanViewSemester()
+            Box() {
+                HorizontalPager(
+                    count = semesters.size,
+                    state = pagerState,
+                    verticalAlignment = Alignment.Top,
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxSize()
+                ) { index ->
+                    when (index) {
+                        0 -> PlanViewAll()
+                        else -> PlanViewSemester()
+                    }
+                }
             }
         }
+
     }
 }
 
@@ -154,7 +174,9 @@ fun PlanViewSemester() {
                             .heightIn(min = 120.dp, max = 120.dp),
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 8.dp).padding(top = 8.dp)
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .padding(top = 8.dp)
                                 .fillMaxWidth()
                                 .wrapContentWidth()
                         ){
