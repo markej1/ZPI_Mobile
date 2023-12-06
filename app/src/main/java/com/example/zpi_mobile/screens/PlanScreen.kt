@@ -27,8 +27,7 @@ import com.example.zpi_mobile.SharedPreferencesManager
 import com.example.zpi_mobile.model.Block
 import com.example.zpi_mobile.navigation.Screen
 import com.example.zpi_mobile.services.SubjectService
-import com.example.zpi_mobile.ui.theme.ChangeColor
-import com.example.zpi_mobile.ui.theme.TitleColor
+import com.example.zpi_mobile.ui.theme.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -167,7 +166,7 @@ fun PlanViewSemester() {
                 Card(
                     onClick = {},
                     colors = CardDefaults.cardColors(
-                            containerColor = Color.Yellow
+                        containerColor = cardColor(type = subjects[index].block_type)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -187,7 +186,7 @@ fun PlanViewSemester() {
                                 .padding(top = 8.dp)
                                 .fillMaxWidth()
                                 .wrapContentWidth()
-                        ){
+                        ) {
                             Text(
                                 text = subjects[index].ects + " ECTS",
                                 style = textStyle,
@@ -242,7 +241,7 @@ fun PlanViewAll() {
             items(subjects.size) { index ->
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.Blue
+                        containerColor = cardColor(type = subjects[index].block_type)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -267,5 +266,20 @@ fun PlanViewAll() {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun cardColor(type: String): Color {
+    return when (type) {
+        "przedmiot kierunkowy" -> przedmiotKierunkowy
+        "przedmiot specjalnościowy" -> przedmiotSpecjalnosciowy
+        "przedmiot nauk podstawowych" -> przedmiotNaukPodstawowych
+        "przedmiot kształcenia ogólnego" -> przedmiotKsztalceniaOgolnego
+        "blok kierunkowy" -> blokKierunkowy
+        "blok specjalnościowy" -> blokSpecjalnosciowy
+        "blok kształcenia ogólnego" -> blokKsztalceniaOgolnego
+        "blok nauk podstawowych" -> blokNaukPodstawowych
+        else -> Color.Black
     }
 }
