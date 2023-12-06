@@ -3,6 +3,7 @@ package com.example.zpi_mobile.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,7 +23,10 @@ fun HelpScreen() {
             modifier = Modifier.padding(horizontal = 40.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
-            Text(text = "Zajęcia obowiązkowe:")
+            Text(
+                text = "Zajęcia obowiązkowe:",
+                style = MaterialTheme.typography.titleMedium
+            )
             Column(
                 verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
@@ -39,7 +43,10 @@ fun HelpScreen() {
             modifier = Modifier.padding(horizontal = 40.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
-            Text(text = "Bloki wybieralne:")
+            Text(
+                text = "Bloki wybieralne:",
+                style = MaterialTheme.typography.titleMedium
+            )
             Column(
                 verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {

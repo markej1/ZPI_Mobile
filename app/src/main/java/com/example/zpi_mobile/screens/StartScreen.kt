@@ -3,6 +3,8 @@
 package com.example.zpi_mobile.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -10,17 +12,21 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
+import com.example.zpi_mobile.R
 import com.example.zpi_mobile.SharedPreferencesManager
 import com.example.zpi_mobile.Start
 import com.example.zpi_mobile.navigation.Screen
+import com.example.zpi_mobile.ui.theme.StartBackgroundColor
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,66 +57,82 @@ fun StartScreen(navController: NavController) {
 //            )
 //        },
         content = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(0.dp, 50.dp)
-            ) {
-                Column {
-                    StartProgramChoice(
-                        text = "Wybierz stopień studiów",
-                        visibility = true,
-                        possibilities = levels,
-                        key = "level",
-                        onClick = {
-                            visible2 = true
-                            visible3 = false
-                            visible4 = false
-                            sharedPreferencesManager.saveData("field", "")
-                            sharedPreferencesManager.saveData("cycle", "")
-                            sharedPreferencesManager.saveData("specialization", "")
-                            fields = start.getFields()
+            Box(modifier = Modifier.background(StartBackgroundColor)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(0.dp, 50.dp)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(70.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.title_logo),
+                            contentDescription = "logo"
+                        )
+                        Text(
+                            text = "Programy studiów",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Column {
+                            StartProgramChoice(
+                                text = "Wybierz stopień studiów",
+                                visibility = true,
+                                possibilities = levels,
+                                key = "level",
+                                onClick = {
+                                    visible2 = true
+                                    visible3 = false
+                                    visible4 = false
+                                    sharedPreferencesManager.saveData("field", "")
+                                    sharedPreferencesManager.saveData("cycle", "")
+                                    sharedPreferencesManager.saveData("specialization", "")
+                                    fields = start.getFields()
+                                }
+                            )
+                            StartProgramChoice(
+                                text = "Wybierz kierunek studiów",
+                                visibility = visible2,
+                                possibilities = fields,
+                                key = "field",
+                                onClick = {
+                                    visible3 = true
+                                    visible4 = false
+                                    sharedPreferencesManager.saveData("cycle", "")
+                                    sharedPreferencesManager.saveData("specialization", "")
+                                    cycles = start.getCycles()
+                                }
+                            )
+                            StartProgramChoice(
+                                text = "Wybierz cykl kształcenia",
+                                visibility = visible3,
+                                possibilities = cycles,
+                                key = "cycle",
+                                onClick = {
+                                    visible4 = true
+                                    sharedPreferencesManager.saveData("specialization", "")
+                                    specializations = start.getSpecializations()
+                                }
+                            )
+                            StartProgramChoice(
+                                text = "Wybierz specjalność",
+                                visibility = visible4,
+                                possibilities = specializations,
+                                key = "specialization",
+                                onClick = {
+                                    navController.navigate(Screen.MenuScreen.route)
+                                }
+                            )
                         }
-                    )
-                    StartProgramChoice(
-                        text = "Wybierz kierunek studiów",
-                        visibility = visible2,
-                        possibilities = fields,
-                        key = "field",
-                        onClick = {
-                            visible3 = true
-                            visible4 = false
-                            sharedPreferencesManager.saveData("cycle", "")
-                            sharedPreferencesManager.saveData("specialization", "")
-                            cycles = start.getCycles()
-                        }
-                    )
-                    StartProgramChoice(
-                        text = "Wybierz cykl kształcenia",
-                        visibility = visible3,
-                        possibilities = cycles,
-                        key = "cycle",
-                        onClick = {
-                            visible4 = true
-                            sharedPreferencesManager.saveData("specialization", "")
-                            specializations = start.getSpecializations()
-                        }
-                    )
-                    StartProgramChoice(
-                        text = "Wybierz specjalność",
-                        visibility = visible4,
-                        possibilities = specializations,
-                        key = "specialization",
-                        onClick = {
-                            navController.navigate(Screen.MenuScreen.route)
-                        }
-                    )
+                    }
                 }
             }
         }
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StartProgramChoice(
     text: String,
@@ -129,46 +151,58 @@ fun StartProgramChoice(
         }
         var outlineTextFieldSize by remember { mutableStateOf(Size.Zero) }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        ) {
-            OutlinedTextField(
-                value = sharedPreferencesManager.getData(key, ""),
-                onValueChange = {
-                    sharedPreferencesManager.saveData(key, it)
-                },
-                label = { Text(text) },
-                modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
-                    outlineTextFieldSize = layoutCoordinates.size.toSize()
-                },
-                trailingIcon = {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = "Expand",
-                        modifier = Modifier.clickable { expanded = !expanded }
-                    )
-                }
-            )
-            DropdownMenu(
+        Box {
+            ExposedDropdownMenuBox(
                 expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.width(
-                    with(LocalDensity.current) {
-                        outlineTextFieldSize.width.toDp()
-                    }
-                )
+                onExpandedChange = { expanded = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)
             ) {
-                possibilities.forEach { possibility ->
-                    DropdownMenuItem(
-                        text = { Text(possibility) },
-                        onClick = {
-                            sharedPreferencesManager.saveData(key, possibility)
-                            expanded = false
-                            onClick()
+                OutlinedTextField(
+                    value = sharedPreferencesManager.getData(key, ""),
+                    onValueChange = {
+                        sharedPreferencesManager.saveData(key, it)
+                    },
+                    label = { Text(text) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onGloballyPositioned { coordinates ->
+                            outlineTextFieldSize = coordinates.size.toSize()
+                        },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = "Expand",
+                            modifier = Modifier.clickable { expanded = !expanded }
+                        )
+                    },
+                    readOnly = true
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.width(
+                        with(LocalDensity.current) {
+                            outlineTextFieldSize.width.toDp()
                         }
                     )
+                ) {
+                    possibilities.forEach { possibility ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = possibility,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            },
+                            onClick = {
+                                sharedPreferencesManager.saveData(key, possibility)
+                                expanded = false
+                                onClick()
+                            }
+                        )
+                    }
                 }
             }
         }

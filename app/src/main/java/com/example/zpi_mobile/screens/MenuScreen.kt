@@ -3,19 +3,21 @@
 package com.example.zpi_mobile.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.zpi_mobile.SharedPreferencesManager
 import com.example.zpi_mobile.navigation.Screen
+import com.example.zpi_mobile.ui.theme.StatusBarColor
+
+val rowArrangement = Arrangement.SpaceBetween
+val paddingHorizontal = 20.dp
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,6 +28,8 @@ fun MenuScreen(navController: NavController) {
     val field = sharedPreferencesManager.getData("field", "")
     val cycle = sharedPreferencesManager.getData("cycle", "")
     val specialization = sharedPreferencesManager.getData("specialization", "")
+
+    val infoArrangement = Arrangement.spacedBy(10.dp)
 
     Scaffold(
         topBar = {
@@ -40,35 +44,48 @@ fun MenuScreen(navController: NavController) {
             )
         },
         content = {
-            Box(
+            Column(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceAround
             ) {
-                Column() {
-                    Column() {
-                        Row() {
-                            Text("Stopień studiów:")
-                            Text(level)
-                        }
-                        Row() {
-                            Text("Cykl kształcenia:")
-                            Text(cycle)
-                        }
-                        if (specialization != "") {
-                            Row() {
-                                Text("Specjalność:")
-                                Text(specialization)
-                            }
-                        }
+                Column(verticalArrangement = infoArrangement) {
+                    RowInformation(text = "Stopień studiów:", answer = level)
+                    RowInformation(text = "Cykl kształcenia:", answer = cycle)
+                    if (specialization != "") {
+                        RowInformation(text = "Specjalność:", answer = specialization)
                     }
-                    Button(onClick = {
+                    RowInformation(text = "Profil:", answer = "ogólnoakademicki")
+                    RowInformation(text = "Poziom studiów:", answer = "pierwszy")
+                    RowInformation(text = "Forma studiów:", answer = "stacjonarna")
+                    RowInformation(text = "Język studiów:", answer = "polski")
+                }
+                Button(
+                    onClick = {
                         navController.navigate(Screen.PlanScreen.route)
-                    }) {
-                        Text(text = "Plan studiów")
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = StatusBarColor)
+                ) {
+                    Text(
+                        text = "Plan studiów",
+                        style = MaterialTheme.typography.titleSmall
+                    )
                 }
             }
         }
     )
 
+}
+
+@Composable
+fun RowInformation(text: String, answer: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = paddingHorizontal),
+        horizontalArrangement = rowArrangement
+    ) {
+        Text(text)
+        Text(answer)
+    }
 }

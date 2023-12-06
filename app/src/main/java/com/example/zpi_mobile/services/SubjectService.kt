@@ -58,7 +58,7 @@ class SubjectService {
                 hours = "21000",
                 ects = "5",
                 exam = "E",
-                block_type = "przedmiot kierunkowy",
+                block_type = "przedmiot kształcenia ogólnego",
                 subjects = listOf(
                     Subject(
                         id = 1,
@@ -105,7 +105,7 @@ class SubjectService {
                 hours = "21000",
                 ects = "5",
                 exam = "",
-                block_type = "przedmiot kierunkowy",
+                block_type = "przedmiot specjalnościowy",
                 subjects = listOf(
                     Subject(
                         id = 1,
@@ -152,7 +152,7 @@ class SubjectService {
                 hours = "21000",
                 ects = "5",
                 exam = "",
-                block_type = "przedmiot kierunkowy",
+                block_type = "przedmiot nauk podstawowych",
                 subjects = listOf(
                     Subject(
                         id = 1,
@@ -199,7 +199,7 @@ class SubjectService {
                 hours = "21000",
                 ects = "5",
                 exam = "",
-                block_type = "przedmiot kierunkowy",
+                block_type = "blok kierunkowy",
                 subjects = listOf(
                     Subject(
                         id = 1,
@@ -246,7 +246,7 @@ class SubjectService {
                 hours = "21000",
                 ects = "5",
                 exam = "",
-                block_type = "przedmiot kierunkowy",
+                block_type = "blok kształcenia ogólnego",
                 subjects = listOf(
                     Subject(
                         id = 1,

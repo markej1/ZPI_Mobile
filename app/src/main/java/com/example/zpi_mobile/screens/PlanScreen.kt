@@ -16,15 +16,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.zpi_mobile.R
+import com.example.zpi_mobile.SharedPreferencesManager
 import com.example.zpi_mobile.model.Block
 import com.example.zpi_mobile.navigation.Screen
 import com.example.zpi_mobile.services.SubjectService
+import com.example.zpi_mobile.ui.theme.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -54,7 +57,7 @@ fun PlanScreen(navController: NavController) {
             SmallFloatingActionButton(
                 onClick = { navController.navigate(Screen.HelpScreen.route) },
                 shape = CircleShape,
-                modifier = Modifier.size(75.dp)
+                modifier = Modifier.size(60.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.question_mark),
@@ -71,21 +74,21 @@ fun PlanScreen(navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.Green)
-                    .padding(0.dp, 15.dp),
+                    .background(TitleColor)
+                    .padding(0.dp, 14.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Informatyka Stosowana",
-                    color = Color.Black,
-                    fontSize = 32.sp
+                    text = SharedPreferencesManager(LocalContext.current)
+                        .getData("field", ""),
+                    style = MaterialTheme.typography.titleLarge
                 )
             }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = Color.Gray)
-                    .padding(0.dp, 15.dp)
+                    .background(color = ChangeColor)
+                    .padding(0.dp, 10.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -109,7 +112,7 @@ fun PlanScreen(navController: NavController) {
                     }
                     Text(
                         text = semester,
-                        fontSize = 24.sp
+                        style = MaterialTheme.typography.bodyLarge
                     )
                     IconButton(
                         enabled = pagerState.currentPage != semesters.size - 1,
@@ -154,15 +157,16 @@ fun PlanScreen(navController: NavController) {
 fun PlanViewSemester() {
     val subjectService = SubjectService()
     val subjects: List<Block> = subjectService.getBlocks()
+    val textStyle: TextStyle = MaterialTheme.typography.bodySmall
     Box(contentAlignment = Alignment.TopCenter) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 128.dp),
+            columns = GridCells.Adaptive(minSize = 164.dp),
         ) {
             items(subjects.size) { index ->
                 Card(
                     onClick = {},
                     colors = CardDefaults.cardColors(
-                            containerColor = Color.Yellow
+                        containerColor = cardColor(type = subjects[index].block_type)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -173,7 +177,8 @@ fun PlanViewSemester() {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .heightIn(min = 120.dp, max = 120.dp),
+                            .heightIn(min = 160.dp),
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         Row(
                             modifier = Modifier
@@ -181,15 +186,17 @@ fun PlanViewSemester() {
                                 .padding(top = 8.dp)
                                 .fillMaxWidth()
                                 .wrapContentWidth()
-                        ){
+                        ) {
                             Text(
                                 text = subjects[index].ects + " ECTS",
+                                style = textStyle,
                                 textAlign = TextAlign.Start,
                                 modifier = Modifier
 
                             )
                             Text(
                                 text = subjects[index].exam,
+                                style = textStyle,
                                 textAlign = TextAlign.End,
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -198,6 +205,7 @@ fun PlanViewSemester() {
                         }
                         Text(
                             text = subjects[index].name,
+                            style = textStyle,
                             maxLines = 4,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
@@ -207,6 +215,7 @@ fun PlanViewSemester() {
                         )
                         Text(
                             text = subjects[index].hours,
+                            style = textStyle,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .fillMaxSize()
@@ -232,7 +241,7 @@ fun PlanViewAll() {
             items(subjects.size) { index ->
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.Blue
+                        containerColor = cardColor(type = subjects[index].block_type)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -243,18 +252,34 @@ fun PlanViewAll() {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .heightIn(min = 120.dp),
+                            .heightIn(min = 110.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = subjects[index].name,
                             maxLines = 4,
                             modifier = Modifier.padding(8.dp),
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun cardColor(type: String): Color {
+    return when (type) {
+        "przedmiot kierunkowy" -> przedmiotKierunkowy
+        "przedmiot specjalnościowy" -> przedmiotSpecjalnosciowy
+        "przedmiot nauk podstawowych" -> przedmiotNaukPodstawowych
+        "przedmiot kształcenia ogólnego" -> przedmiotKsztalceniaOgolnego
+        "blok kierunkowy" -> blokKierunkowy
+        "blok specjalnościowy" -> blokSpecjalnosciowy
+        "blok kształcenia ogólnego" -> blokKsztalceniaOgolnego
+        "blok nauk podstawowych" -> blokNaukPodstawowych
+        else -> Color.Black
     }
 }
