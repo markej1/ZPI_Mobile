@@ -57,7 +57,7 @@ fun StartScreen(navController: NavController) {
 //            )
 //        },
         content = {
-            Box (modifier = Modifier.background(StartBackgroundColor)) {
+            Box(modifier = Modifier.background(StartBackgroundColor)) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -71,7 +71,10 @@ fun StartScreen(navController: NavController) {
                             painter = painterResource(id = R.drawable.title_logo),
                             contentDescription = "logo"
                         )
-                        Text(text = "Programy studiów")
+                        Text(
+                            text = "Programy studiów",
+                            style = MaterialTheme.typography.titleLarge
+                        )
                         Column {
                             StartProgramChoice(
                                 text = "Wybierz stopień studiów",
@@ -187,7 +190,12 @@ fun StartProgramChoice(
                 ) {
                     possibilities.forEach { possibility ->
                         DropdownMenuItem(
-                            text = { Text(possibility) },
+                            text = {
+                                Text(
+                                    text = possibility,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            },
                             onClick = {
                                 sharedPreferencesManager.saveData(key, possibility)
                                 expanded = false

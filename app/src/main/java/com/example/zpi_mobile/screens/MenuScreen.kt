@@ -64,7 +64,10 @@ fun MenuScreen(navController: NavController) {
                     Button(onClick = {
                         navController.navigate(Screen.PlanScreen.route)
                     }) {
-                        Text(text = "Plan studiów")
+                        Text(
+                            text = "Plan studiów",
+                            style = MaterialTheme.typography.titleSmall
+                        )
                     }
                 }
             }
