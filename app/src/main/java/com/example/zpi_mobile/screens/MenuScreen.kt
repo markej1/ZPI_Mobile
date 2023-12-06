@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.zpi_mobile.SharedPreferencesManager
 import com.example.zpi_mobile.navigation.Screen
+import com.example.zpi_mobile.ui.theme.StatusBarColor
 
 val rowArrangement = Arrangement.SpaceBetween
 val paddingHorizontal = 20.dp
@@ -59,9 +60,12 @@ fun MenuScreen(navController: NavController) {
                     RowInformation(text = "Forma studiów:", answer = "stacjonarna")
                     RowInformation(text = "Język studiów:", answer = "polski")
                 }
-                Button(onClick = {
-                    navController.navigate(Screen.PlanScreen.route)
-                }) {
+                Button(
+                    onClick = {
+                        navController.navigate(Screen.PlanScreen.route)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = StatusBarColor)
+                ) {
                     Text(
                         text = "Plan studiów",
                         style = MaterialTheme.typography.titleSmall
@@ -76,7 +80,9 @@ fun MenuScreen(navController: NavController) {
 @Composable
 fun RowInformation(text: String, answer: String) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = paddingHorizontal),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = paddingHorizontal),
         horizontalArrangement = rowArrangement
     ) {
         Text(text)

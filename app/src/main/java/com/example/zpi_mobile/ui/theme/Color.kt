@@ -11,6 +11,8 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val StatusBarColor = Color(0xFF700101)
+val TitleColor = Color(0xFFF38A87)
+val ChangeColor = Color(0xFFC59898)
 
 val przedmiotKierunkowy = Color(0xFFFEE5A5)
 val przedmiotNaukPodstawowych= Color(0xFFA5D9FE)

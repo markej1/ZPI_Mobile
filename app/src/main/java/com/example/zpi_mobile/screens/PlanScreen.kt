@@ -27,6 +27,8 @@ import com.example.zpi_mobile.SharedPreferencesManager
 import com.example.zpi_mobile.model.Block
 import com.example.zpi_mobile.navigation.Screen
 import com.example.zpi_mobile.services.SubjectService
+import com.example.zpi_mobile.ui.theme.ChangeColor
+import com.example.zpi_mobile.ui.theme.TitleColor
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -73,7 +75,7 @@ fun PlanScreen(navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.Green)
+                    .background(TitleColor)
                     .padding(0.dp, 14.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -86,7 +88,7 @@ fun PlanScreen(navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = Color.Gray)
+                    .background(color = ChangeColor)
                     .padding(0.dp, 10.dp)
             ) {
                 Row(
