@@ -56,7 +56,7 @@ fun PlanScreen(navController: NavController) {
             SmallFloatingActionButton(
                 onClick = { navController.navigate(Screen.HelpScreen.route) },
                 shape = CircleShape,
-                modifier = Modifier.size(75.dp)
+                modifier = Modifier.size(60.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.question_mark),
@@ -177,6 +177,7 @@ fun PlanViewSemester() {
                         modifier = Modifier
                             .fillMaxSize()
                             .heightIn(min = 160.dp),
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         Row(
                             modifier = Modifier
