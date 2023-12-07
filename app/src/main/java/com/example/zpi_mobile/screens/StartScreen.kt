@@ -3,7 +3,6 @@
 package com.example.zpi_mobile.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,8 +28,6 @@ import com.example.zpi_mobile.http.receive.StartService
 import com.example.zpi_mobile.model.Level
 import com.example.zpi_mobile.navigation.Screen
 import com.example.zpi_mobile.ui.theme.StartBackgroundColor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -56,7 +53,6 @@ fun StartScreen(navController: NavController) {
     val levelNames = levels.map { it.levelName }
 
     val scope = rememberCoroutineScope()
-
 
     Scaffold(
 //        topBar = {
@@ -90,14 +86,7 @@ fun StartScreen(navController: NavController) {
                                 visibility = true,
                                 possibilities = levelNames,
                                 key = "level",
-                                onClick = {
-                                    visible2 = true
-                                    visible3 = false
-                                    visible4 = false
-                                    sharedPreferencesManager.saveData("field", "")
-                                    sharedPreferencesManager.saveData("cycle", "")
-                                    sharedPreferencesManager.saveData("specialization", "")
-
+                                onValueChanged = {
                                     scope.launch {
                                         try {
                                             fields = startService.getFields(
@@ -106,10 +95,13 @@ fun StartScreen(navController: NavController) {
                                                     levels = levels
                                                 )
                                             )
-                                        }
-                                        catch (e: Exception) {
-                                            Log.d("ococho6", e.toString())
-                                        }
+                                            visible2 = true
+                                            visible3 = false
+                                            visible4 = false
+                                            sharedPreferencesManager.saveData("field", "")
+                                            sharedPreferencesManager.saveData("cycle", "")
+                                            sharedPreferencesManager.saveData("specialization", "")
+                                        } catch (_: Exception) {}
                                     }
                                 }
                             )
@@ -161,7 +153,8 @@ fun StartProgramChoice(
     visibility: Boolean? = false,
     possibilities: List<String>,
     key: String,
-    onClick: () -> Unit
+    onClick: () -> Unit = {},
+    onValueChanged: () -> Unit = {}
 ) {
     if (visibility == true) {
         val sharedPreferencesManager = SharedPreferencesManager(LocalContext.current)
@@ -184,7 +177,7 @@ fun StartProgramChoice(
                 OutlinedTextField(
                     value = sharedPreferencesManager.getData(key, ""),
                     onValueChange = {
-                        sharedPreferencesManager.saveData(key, it)
+//                        sharedPreferencesManager.saveData(key, it)
                     },
                     label = { Text(text) },
                     modifier = Modifier
@@ -222,6 +215,7 @@ fun StartProgramChoice(
                                 sharedPreferencesManager.saveData(key, possibility)
                                 expanded = false
                                 onClick()
+                                onValueChanged()
                             }
                         )
                     }
@@ -233,7 +227,7 @@ fun StartProgramChoice(
 }
 
 fun getLevelInt(sharedPreferencesManager: SharedPreferencesManager, levels: List<Level>): Int {
-    val levelName = sharedPreferencesManager.getData("level","")
+    val levelName = sharedPreferencesManager.getData("level", "")
     for (level in levels) {
         if (levelName == level.levelName) {
             return level.number
