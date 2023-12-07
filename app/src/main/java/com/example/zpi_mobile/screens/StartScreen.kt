@@ -3,6 +3,7 @@
 package com.example.zpi_mobile.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,8 +26,12 @@ import androidx.navigation.NavController
 import com.example.zpi_mobile.R
 import com.example.zpi_mobile.SharedPreferencesManager
 import com.example.zpi_mobile.http.receive.StartService
+import com.example.zpi_mobile.model.Level
 import com.example.zpi_mobile.navigation.Screen
 import com.example.zpi_mobile.ui.theme.StartBackgroundColor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +52,10 @@ fun StartScreen(navController: NavController) {
     var fields = remember { mutableStateListOf<String>() }
     var cycles = remember { mutableStateListOf<String>() }
     var specializations = remember { mutableStateListOf<String>() }
+
+    val levelNames = levels.map { it.levelName }
+
+    val scope = rememberCoroutineScope()
 
 
     Scaffold(
@@ -79,7 +88,7 @@ fun StartScreen(navController: NavController) {
                             StartProgramChoice(
                                 text = "Wybierz stopień studiów",
                                 visibility = true,
-                                possibilities = levels,
+                                possibilities = levelNames,
                                 key = "level",
                                 onClick = {
                                     visible2 = true
@@ -88,7 +97,20 @@ fun StartScreen(navController: NavController) {
                                     sharedPreferencesManager.saveData("field", "")
                                     sharedPreferencesManager.saveData("cycle", "")
                                     sharedPreferencesManager.saveData("specialization", "")
-                                    fields = startService.getFields()
+
+//                                    scope.launch {
+//                                        try {
+//                                            fields = startService.getFields(
+//                                                getLevelInt(
+//                                                    sharedPreferencesManager = sharedPreferencesManager,
+//                                                    levels = levels
+//                                                )
+//                                            )
+//                                        }
+//                                        catch (e: Exception) {
+//                                            Log.d("ococho6", e.toString())
+//                                        }
+//                                    }
                                 }
                             )
                             StartProgramChoice(
@@ -208,4 +230,14 @@ fun StartProgramChoice(
         }
 
     }
+}
+
+fun getLevelInt(sharedPreferencesManager: SharedPreferencesManager, levels: List<Level>): Int {
+    val levelName = sharedPreferencesManager.getData("level","")
+    for (level in levels) {
+        if (levelName == level.levelName) {
+            return level.number
+        }
+    }
+    return -1
 }
