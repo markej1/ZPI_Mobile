@@ -427,5 +427,11 @@ class SubjectService: ViewModel() {
         clickedBlock = block
     }
 
+    var chosenSubject by mutableStateOf<Subject?>(null)
+        private set
+
+    fun chooseSubject() {
+
+    }
 
 }

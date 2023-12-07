@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavController
 import com.example.zpi_mobile.model.Block
 import com.example.zpi_mobile.services.SubjectService
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -34,7 +35,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PlanScreen(
-    subjectService: SubjectService
+    subjectService: SubjectService,
+    navController: NavController
 ) {
     val semesters = listOf(
         "Wszystko",
@@ -133,7 +135,7 @@ fun PlanScreen(
             }
             Box {
                 if (subjectService.isDialogShown) {
-                    SubjectSelect(subjectService)
+                    SubjectSelect(subjectService, navController)
                 }
                 HorizontalPager(
                     count = semesters.size,
@@ -144,8 +146,8 @@ fun PlanScreen(
                         .fillMaxSize()
                 ) { index ->
                     when (index) {
-                        0 -> PlanViewAll(subjectService)
-                        else -> PlanViewSemester(subjectService)
+                        0 -> PlanViewAll(subjectService, navController)
+                        else -> PlanViewSemester(subjectService, navController)
                     }
                 }
             }
@@ -159,13 +161,18 @@ fun SubjectTile(
     isInSelectDialog: Boolean,
     id: Int,
     block: Block,
-    subjectService: SubjectService
+    subjectService: SubjectService,
+    navController: NavController
 ) {
     val subjects: List<Block> = subjectService.getBlocks()
     
     Card(
         onClick = {
-            subjectService.showDialog(block)
+            if(block.subjects.size > 1) {
+                subjectService.showDialog(block)
+            } else {
+                navController.navigate("subject_card_screen")
+            }
             subjectService.chooseBlock(block)
                   },
         colors = CardDefaults.cardColors(
@@ -225,7 +232,8 @@ fun SubjectTile(
 
 @Composable
 fun PlanViewSemester(
-    subjectService: SubjectService
+    subjectService: SubjectService,
+    navController: NavController
 ) {
     val subjects: List<Block> = subjectService.getBlocks()
     Box(contentAlignment = Alignment.TopCenter) {
@@ -233,7 +241,7 @@ fun PlanViewSemester(
             columns = GridCells.Adaptive(minSize = 128.dp),
         ) {
             items(subjects.size) { index ->
-               SubjectTile(false, 0, subjects[index], subjectService)
+               SubjectTile(false, 0, subjects[index], subjectService, navController)
             }
         }
     }
@@ -242,7 +250,8 @@ fun PlanViewSemester(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanViewAll(
-    subjectService: SubjectService
+    subjectService: SubjectService,
+    navController: NavController
 ) {
     val subjects: List<Block> = subjectService.getBlocks()
     Box(contentAlignment = Alignment.TopCenter) {
@@ -252,7 +261,11 @@ fun PlanViewAll(
             items(subjects.size) { index ->
                 Card(
                     onClick = {
-                        subjectService.showDialog(subjects[index])
+                        if(subjects[index].subjects.size > 1) {
+                            subjectService.showDialog(subjects[index])
+                        } else {
+                            navController.navigate("subject_card_screen")
+                        }
                         subjectService.chooseBlock(subjects[index])
                               },
                     colors = CardDefaults.cardColors(
@@ -286,7 +299,8 @@ fun PlanViewAll(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubjectSelect(
-    subjectService: SubjectService
+    subjectService: SubjectService,
+    navController: NavController
 ) {
     val clickedBlock = subjectService.clickedBlock
     val subjects = clickedBlock?.subjects
@@ -304,7 +318,7 @@ fun SubjectSelect(
             LazyColumn {
                 subjects?.size?.let {
                     items(it) { index ->
-                        SubjectTile(true, index, clickedBlock, subjectService)
+                        SubjectTile(true, index, clickedBlock, subjectService, navController)
                     }
                 }
             }
