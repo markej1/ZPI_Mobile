@@ -9,6 +9,8 @@ interface IBlock {
     val subjects: List<Subject>
 }
 
+@Suppress("PLUGIN_IS_NOT_ENABLED")
+@kotlinx.serialization.Serializable
 data class Block(
     override val name: String,
     override val hours: String,

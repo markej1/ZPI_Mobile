@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
 import com.example.zpi_mobile.R
 import com.example.zpi_mobile.SharedPreferencesManager
-import com.example.zpi_mobile.Start
+import com.example.zpi_mobile.http.receive.StartService
 import com.example.zpi_mobile.navigation.Screen
 import com.example.zpi_mobile.ui.theme.StartBackgroundColor
 
@@ -42,8 +42,8 @@ fun StartScreen(navController: NavController) {
     sharedPreferencesManager.saveData("cycle", "")
     sharedPreferencesManager.saveData("specialization", "")
 
-    val start = Start()
-    val levels = start.getLevels()
+    val startService = StartService()
+    val levels = startService.getLevels()
     var fields = remember { mutableStateListOf<String>() }
     var cycles = remember { mutableStateListOf<String>() }
     var specializations = remember { mutableStateListOf<String>() }
@@ -88,7 +88,7 @@ fun StartScreen(navController: NavController) {
                                     sharedPreferencesManager.saveData("field", "")
                                     sharedPreferencesManager.saveData("cycle", "")
                                     sharedPreferencesManager.saveData("specialization", "")
-                                    fields = start.getFields()
+                                    fields = startService.getFields()
                                 }
                             )
                             StartProgramChoice(
@@ -101,7 +101,7 @@ fun StartScreen(navController: NavController) {
                                     visible4 = false
                                     sharedPreferencesManager.saveData("cycle", "")
                                     sharedPreferencesManager.saveData("specialization", "")
-                                    cycles = start.getCycles()
+                                    cycles = startService.getCycles()
                                 }
                             )
                             StartProgramChoice(
@@ -112,7 +112,7 @@ fun StartScreen(navController: NavController) {
                                 onClick = {
                                     visible4 = true
                                     sharedPreferencesManager.saveData("specialization", "")
-                                    specializations = start.getSpecializations()
+                                    specializations = startService.getSpecializations()
                                 }
                             )
                             StartProgramChoice(

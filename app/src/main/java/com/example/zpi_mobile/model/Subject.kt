@@ -14,6 +14,8 @@ interface ISubject {
     val link: String
 }
 
+@Suppress("PLUGIN_IS_NOT_ENABLED")
+@kotlinx.serialization.Serializable
 data class Subject(
     override val id: Int,
     override val name: String,

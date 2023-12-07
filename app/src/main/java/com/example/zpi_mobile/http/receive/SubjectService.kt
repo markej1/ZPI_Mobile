@@ -1,4 +1,4 @@
-package com.example.zpi_mobile.services
+package com.example.zpi_mobile.http.receive
 
 import com.example.zpi_mobile.model.*
 

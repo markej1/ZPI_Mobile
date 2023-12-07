@@ -26,7 +26,7 @@ import com.example.zpi_mobile.R
 import com.example.zpi_mobile.SharedPreferencesManager
 import com.example.zpi_mobile.model.Block
 import com.example.zpi_mobile.navigation.Screen
-import com.example.zpi_mobile.services.SubjectService
+import com.example.zpi_mobile.http.receive.SubjectService
 import com.example.zpi_mobile.ui.theme.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager

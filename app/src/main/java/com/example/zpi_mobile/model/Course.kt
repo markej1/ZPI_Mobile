@@ -7,6 +7,8 @@ interface Course {
     val crediting: String
 }
 
+@Suppress("PLUGIN_IS_NOT_ENABLED")
+@kotlinx.serialization.Serializable
 data class Lecture(
     override val ECTS: String,
     override val ZZU: String,
@@ -14,6 +16,8 @@ data class Lecture(
     override val crediting: String
 ): Course
 
+@Suppress("PLUGIN_IS_NOT_ENABLED")
+@kotlinx.serialization.Serializable
 data class Seminar(
     override val ECTS: String,
     override val ZZU: String,
@@ -21,6 +25,8 @@ data class Seminar(
     override val crediting: String
 ): Course
 
+@Suppress("PLUGIN_IS_NOT_ENABLED")
+@kotlinx.serialization.Serializable
 data class Laboratory(
     override val ECTS: String,
     override val ZZU: String,
@@ -28,6 +34,8 @@ data class Laboratory(
     override val crediting: String
 ): Course
 
+@Suppress("PLUGIN_IS_NOT_ENABLED")
+@kotlinx.serialization.Serializable
 data class Classes(
     override val ECTS: String,
     override val ZZU: String,
@@ -35,6 +43,8 @@ data class Classes(
     override val crediting: String
 ): Course
 
+@Suppress("PLUGIN_IS_NOT_ENABLED")
+@kotlinx.serialization.Serializable
 data class Project(
     override val ECTS: String,
     override val ZZU: String,

@@ -1,9 +1,9 @@
-package com.example.zpi_mobile
+package com.example.zpi_mobile.http.receive
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
-class Start {
+class StartService {
 
     fun getLevels(): List<String> {
         return listOf("I stopień", "II stopień")
