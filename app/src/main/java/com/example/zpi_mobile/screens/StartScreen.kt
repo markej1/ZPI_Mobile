@@ -98,19 +98,19 @@ fun StartScreen(navController: NavController) {
                                     sharedPreferencesManager.saveData("cycle", "")
                                     sharedPreferencesManager.saveData("specialization", "")
 
-//                                    scope.launch {
-//                                        try {
-//                                            fields = startService.getFields(
-//                                                getLevelInt(
-//                                                    sharedPreferencesManager = sharedPreferencesManager,
-//                                                    levels = levels
-//                                                )
-//                                            )
-//                                        }
-//                                        catch (e: Exception) {
-//                                            Log.d("ococho6", e.toString())
-//                                        }
-//                                    }
+                                    scope.launch {
+                                        try {
+                                            fields = startService.getFields(
+                                                getLevelInt(
+                                                    sharedPreferencesManager = sharedPreferencesManager,
+                                                    levels = levels
+                                                )
+                                            )
+                                        }
+                                        catch (e: Exception) {
+                                            Log.d("ococho6", e.toString())
+                                        }
+                                    }
                                 }
                             )
                             StartProgramChoice(
