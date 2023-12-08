@@ -2,6 +2,8 @@
 
 package com.example.zpi_mobile.screens
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,18 +27,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.zpi_mobile.model.Course
 import com.example.zpi_mobile.services.SubjectService
 
 @Composable
 fun SubjectCardScreen(
-    subjectService: SubjectService
+    subjectService: SubjectService,
+    navController: NavController
 ) {
     Column {
         SmallTopAppBar(
-            title = { Text(text = "Nazwa przedmiotu") },
+            title = { Text(text = subjectService.chosenSubject!!.name) },
             navigationIcon = {
-                IconButton(onClick = { /*TODO*/ }, content = {
+                IconButton(onClick = { navController.navigateUp() }, content = {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "navigate back"
@@ -46,35 +52,27 @@ fun SubjectCardScreen(
         )
         LazyColumn {
             items(1) {
-                SubjectInfo()
-                ListItem("Wykład")
-                ListItem("Ćwiczenia")
-                ListItem("Laboratorium")
-                ListItem("Seminarium")
-                ListItem("Projekt")
-                ProgrammeContent(programmeContent = arrayOf<String>(
-                    "Złożoności (1/4), iteratory.",
-                    "Złożoności (2/4), listy wiązane.",
-                    "Złożoności (3/4), stosy i kolejki zwykłe.",
-                    "Złożoności (4/4), techniki rozwiązywania problemów",
-                    "Komparatory, sortowania proste.",
-                    "Sortowania efektywne. Kopiec. ",
-                    "Wyszukiwania liniowe i binarne, kolejki priorytetowe, tablice mieszające",
-                    "Drzewa przedziałowe, kopce dwumianowe, las zbiorów rozłącznych.",
-                    "Przekazywanie akcji i danych – intencje, współdziałanie aktywności, użycie aktywności systemowych. Obsługa zmiany konfiguracji. "
-                ))
-                Link()
+                SubjectInfo(subjectService)
+                ListItem("Wykład", subjectService.chosenSubject!!.lecture)
+                ListItem("Ćwiczenia", subjectService.chosenSubject!!.classes)
+                ListItem("Laboratorium", subjectService.chosenSubject!!.laboratory)
+                ListItem("Seminarium", subjectService.chosenSubject!!.seminar)
+                ListItem("Projekt", subjectService.chosenSubject!!.project)
+                ProgrammeContent(programmeContent = subjectService.chosenSubject!!.programme_content)
+                Link("https://wit.pwr.edu.pl/studenci/programy-studiow/2023-2024-studia-i-stopnia")
             }
         }
     }
 }
 
 @Composable
-fun SubjectInfo() {
+fun SubjectInfo(
+    subjectService: SubjectService
+) {
     ElevatedCard(modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
         Row(modifier = Modifier.padding(all = 10.dp)) {
             Text(text = "Rodzaj przedmiotu:")
-            Text(text = "Obowiązkowy", modifier = Modifier
+            Text(text = subjectService.chosenSubject!!.kind_of_subject, modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentWidth(Alignment.End)
             )
@@ -84,7 +82,8 @@ fun SubjectInfo() {
 
 @Composable
 fun ListItem(
-    course: String
+    courseType: String,
+    course: Course
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -96,7 +95,7 @@ fun ListItem(
     ) {
         Column(modifier = Modifier.padding(all = 10.dp)) {
             Row {
-                Text(text = course)
+                Text(text = courseType)
                 Icon(
                     imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = "expand card",
@@ -109,31 +108,31 @@ fun ListItem(
             if (expanded) {
                 Row {
                     Text(text = "Liczba godzin CNPS:")
-                    Text(text = "30", modifier = Modifier
+                    Text(text = course.CNPS, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Liczba godzin ZZU:")
-                    Text(text = "150", modifier = Modifier
+                    Text(text = course.ZZU, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Forma zaliczenia:")
-                    Text(text = "Zaliczenie na ocenę", modifier = Modifier
+                    Text(text = course.crediting, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Punkty ECTS:")
-                    Text(text = "5", modifier = Modifier
+                    Text(text = course.ECTS, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Grupa kursów:")
-                    Text(text = "Tak", modifier = Modifier
+                    Text(text = course.crediting, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
@@ -144,7 +143,7 @@ fun ListItem(
 
 @Composable
 fun ProgrammeContent(
-    programmeContent: Array<String>
+    programmeContent: List<String>
 ) {
     var i = 1
     ElevatedCard(modifier = Modifier
@@ -164,13 +163,21 @@ fun ProgrammeContent(
 }
 
 @Composable
-fun Link() {
-    ElevatedCard(onClick = { /*TODO*/ }, modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 10.dp, vertical = 5.dp)) {
+fun Link(
+    url: String
+) {
+    val context = LocalContext.current
+    ElevatedCard(
+        onClick = {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            context.startActivity(intent)
+                  },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp, vertical = 5.dp)) {
         Column(modifier = Modifier.padding(all = 10.dp)) {
             Text(text = "Link do oryginału:", modifier = Modifier.padding(bottom = 5.dp))
-            Text(text = "https://wit.pwr.edu.pl/studenci/programy-studiow/2023-2024-studia-i-stopnia")
+            Text(text = url)
         }
     }
 }

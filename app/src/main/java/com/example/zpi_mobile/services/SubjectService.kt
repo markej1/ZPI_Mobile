@@ -33,7 +33,17 @@ class SubjectService: ViewModel() {
                             crediting = ""
                         ),
                         group_of_courses = "NIE",
-                        programme_content = listOf(),
+                        programme_content = listOf(
+                            "Złożoności (1/4), iteratory.",
+                            "Złożoności (2/4), listy wiązane.",
+                            "Złożoności (3/4), stosy i kolejki zwykłe.",
+                            "Złożoności (4/4), techniki rozwiązywania problemów",
+                            "Komparatory, sortowania proste.",
+                            "Sortowania efektywne. Kopiec. ",
+                            "Wyszukiwania liniowe i binarne, kolejki priorytetowe, tablice mieszające",
+                            "Drzewa przedziałowe, kopce dwumianowe, las zbiorów rozłącznych.",
+                            "Przekazywanie akcji i danych – intencje, współdziałanie aktywności, użycie aktywności systemowych. Obsługa zmiany konfiguracji. "
+                        ),
                         kind_of_subject = "Obowiązkowy",
                         link = "",
                         project = Project(
@@ -227,7 +237,7 @@ class SubjectService: ViewModel() {
                 subjects = listOf(
                     Subject(
                         id = 1,
-                        name = "Organizacja Systemów Komputerowych",
+                        name = "M",
                         lecture = Lecture(
                             ECTS = "3",
                             ZZU = "30",
@@ -242,7 +252,7 @@ class SubjectService: ViewModel() {
                         ),
                         group_of_courses = "NIE",
                         programme_content = listOf(),
-                        kind_of_subject = "Obowiązkowy",
+                        kind_of_subject = "TESTTESTTEST",
                         link = "",
                         project = Project(
                             ECTS = "",
@@ -274,7 +284,7 @@ class SubjectService: ViewModel() {
                 subjects = listOf(
                     Subject(
                         id = 1,
-                        name = "Organizacja Systemów Komputerowych",
+                        name = "Wpowadzenie do zarządzania projektami informatycznymi",
                         lecture = Lecture(
                             ECTS = "3",
                             ZZU = "30",
@@ -430,8 +440,15 @@ class SubjectService: ViewModel() {
     var chosenSubject by mutableStateOf<Subject?>(null)
         private set
 
-    fun chooseSubject() {
+    fun chooseSubject(subject: Subject) {
+        chosenSubject = subject
+    }
 
+    fun getSubjectByName(name: String, block: Block): Subject? {
+        for (subject in block.subjects) {
+            if (subject.name == name) return subject
+        }
+        return null
     }
 
 }

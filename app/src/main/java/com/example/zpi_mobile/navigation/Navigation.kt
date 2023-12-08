@@ -21,7 +21,7 @@ fun Navigation(
             MenuScreen()
         }
         composable(route = Screen.SubjectCardScreen.route) {
-            SubjectCardScreen(subjectService = subjectService)
+            SubjectCardScreen(subjectService = subjectService, navController = navController)
         }
         composable(route = Screen.PlanScreen.route) {
             PlanScreen(subjectService = subjectService, navController = navController)

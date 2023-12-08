@@ -164,16 +164,18 @@ fun SubjectTile(
     subjectService: SubjectService,
     navController: NavController
 ) {
-    val subjects: List<Block> = subjectService.getBlocks()
-    
     Card(
         onClick = {
-            if(block.subjects.size > 1) {
+            subjectService.chooseBlock(block)
+            if (block.subjects.size > 1 && !isInSelectDialog) {
                 subjectService.showDialog(block)
             } else {
-                navController.navigate("subject_card_screen")
+                val subject = subjectService.getSubjectByName(block.subjects[id].name, block)
+                if (subject != null) {
+                    subjectService.chooseSubject(subject)
+                    navController.navigate("subject_card_screen")
+                }
             }
-            subjectService.chooseBlock(block)
                   },
         colors = CardDefaults.cardColors(
             containerColor = Color.Yellow
@@ -253,20 +255,24 @@ fun PlanViewAll(
     subjectService: SubjectService,
     navController: NavController
 ) {
-    val subjects: List<Block> = subjectService.getBlocks()
+    val blocks: List<Block> = subjectService.getBlocks()
     Box(contentAlignment = Alignment.TopCenter) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 128.dp),
         ) {
-            items(subjects.size) { index ->
+            items(blocks.size) { index ->
                 Card(
                     onClick = {
-                        if(subjects[index].subjects.size > 1) {
-                            subjectService.showDialog(subjects[index])
+                        subjectService.chooseBlock(blocks[index])
+                        if(blocks[index].subjects.size > 1) {
+                            subjectService.showDialog(blocks[index])
                         } else {
-                            navController.navigate("subject_card_screen")
+                            val subject = subjectService.getSubjectByName(blocks[index].subjects[0].name, blocks[index])
+                            if (subject != null) {
+                                subjectService.chooseSubject(subject)
+                                navController.navigate("subject_card_screen")
+                            }
                         }
-                        subjectService.chooseBlock(subjects[index])
                               },
                     colors = CardDefaults.cardColors(
                         containerColor = Color.Blue
@@ -284,7 +290,7 @@ fun PlanViewAll(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = subjects[index].name,
+                            text = blocks[index].name,
                             maxLines = 4,
                             modifier = Modifier.padding(8.dp),
                             textAlign = TextAlign.Center
@@ -309,13 +315,8 @@ fun SubjectSelect(
         onDismissRequest = { subjectService.dismissDialog() },
         properties = DialogProperties(dismissOnClickOutside = true)
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxHeight()
-                .wrapContentHeight()
-                .padding(8.dp)
-        ) {
-            LazyColumn {
+        Card {
+            LazyColumn(modifier = Modifier.padding(8.dp)) {
                 subjects?.size?.let {
                     items(it) { index ->
                         SubjectTile(true, index, clickedBlock, subjectService, navController)
