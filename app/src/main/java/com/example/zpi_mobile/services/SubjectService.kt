@@ -1,12 +1,18 @@
 package com.example.zpi_mobile.services
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.example.zpi_mobile.model.*
+import io.ktor.client.call.body
+import io.ktor.client.request.get
 
 class SubjectService: ViewModel() {
+
+    private val httpClient = KtorHttpClient()
 
     fun getBlocks(): List<Block> {
         val blocks: List<Block> = listOf(
@@ -419,6 +425,41 @@ class SubjectService: ViewModel() {
         )
         return blocks
     }
+
+    private val _url = "https://susel.pythonanywhere.com/"
+
+//    suspend fun getFields(level: Int): SnapshotStateList<String> {
+//        val fields: List<String> = httpClient
+//            .getHttpClient()
+//            .get("https://susel.pythonanywhere.com/list-field/$level/")
+//            .body()
+//        val fieldsMutableStateList = mutableStateListOf<String>()
+//        for (field in fields) {
+//            fieldsMutableStateList.add(field)
+//        }
+//        return fieldsMutableStateList
+//    }
+
+    suspend fun getAllBlocks(): SnapshotStateList<Block> {
+        val blocks: List<Block> = httpClient
+            .getHttpClient()
+            .get(_url + "list-blocks/")
+            .body()
+
+        return blocks as SnapshotStateList<Block>
+    }
+    suspend fun getBlocksBySemester(semester: Int): SnapshotStateList<Block> {
+        val blocks: List<Block> = httpClient
+            .getHttpClient()
+            .get(_url + "list-blocks/")
+            .body()
+
+        return blocks as SnapshotStateList<Block>
+    }
+
+    suspend fun getAllSubjects() {}
+    suspend fun getSubjectsBySemester(){}
+
 
     var isDialogShown by mutableStateOf(false)
         private set
