@@ -23,27 +23,25 @@ class StartService {
             .getHttpClient()
             .get("https://susel.pythonanywhere.com/list-field/$level/")
             .body()
-        return getMutableStateListFromList(fields)
+        return getStringMutableStateListFromList(fields)
     }
 
-    suspend fun getCycles(level: Int, field: String): SnapshotStateList<String> {
-        val cycles: List<String> = httpClient
+    suspend fun getCycles(level: Int, field: String): SnapshotStateList<Int> {
+        val cycles: List<Int> = httpClient
             .getHttpClient()
             .get("https://susel.pythonanywhere.com/list-cycle/$level/${removeWrongSigns(field)}/")
             .body()
 
-        return getMutableStateListFromList(cycles)
-//        return mutableStateListOf("2020/2021", "2021/2022", "2022/2023", "2023/2024")
+        return getIntMutableStateListFromList(cycles)
     }
 
-    suspend fun getSpecializations(level: Int, field: String, cycle: String): SnapshotStateList<String> {
+    suspend fun getSpecializations(level: Int, field: String, cycle: Int): SnapshotStateList<String> {
         val specializations: List<String> = httpClient
             .getHttpClient()
             .get("https://susel.pythonanywhere.com/list-specialization/$level/${removeWrongSigns(field)}/$cycle/")
             .body()
 
-        return getMutableStateListFromList(specializations)
-//        return mutableStateListOf()
+        return getStringMutableStateListFromList(specializations)
     }
 
     private fun removeWrongSigns(text: String): String {
@@ -54,7 +52,7 @@ class StartService {
             .joinToString(separator = "_")
     }
 
-    private fun getMutableStateListFromList(list: List<String>): SnapshotStateList<String> {
+    private fun getStringMutableStateListFromList(list: List<String>): SnapshotStateList<String> {
         val mutableStateList = mutableStateListOf<String>()
         for (element in list) {
             mutableStateList.add(element)
@@ -62,20 +60,12 @@ class StartService {
         return mutableStateList
     }
 
-}
+    private fun getIntMutableStateListFromList(list: List<Int>): SnapshotStateList<Int> {
+        val mutableStateList = mutableStateListOf<Int>()
+        for (element in list) {
+            mutableStateList.add(element)
+        }
+        return mutableStateList
+    }
 
-//private fun getStringMutableStateListFromList(list: List<String>): SnapshotStateList<String> {
-//    val mutableStateList = mutableStateListOf<String>()
-//    for (element in list) {
-//        mutableStateList.add(element)
-//    }
-//    return mutableStateList
-//}
-//
-//private fun getIntMutableStateListFromList(list: List<Int>): SnapshotStateList<Int> {
-//    val mutableStateList = mutableStateListOf<Int>()
-//    for (element in list) {
-//        mutableStateList.add(element)
-//    }
-//    return mutableStateList
-//}
+}

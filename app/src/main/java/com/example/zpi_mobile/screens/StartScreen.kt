@@ -3,7 +3,6 @@
 package com.example.zpi_mobile.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +12,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -48,11 +48,11 @@ fun StartScreen(navController: NavController) {
     val startService = StartService()
     val levels = startService.getLevels()
     var fields = remember { mutableStateListOf<String>() }
-    var cycles = remember { mutableStateListOf<String>() }
     var specializations = remember { mutableStateListOf<String>() }
 
     val levelNames = levels.map { it.levelName }
     var levelNumber by remember { mutableStateOf(0) }
+    var cyclesDisplay = remember { mutableStateListOf<String>() }
 
     val scope = rememberCoroutineScope()
 
@@ -92,9 +92,7 @@ fun StartScreen(navController: NavController) {
                                                 sharedPreferencesManager = sharedPreferencesManager,
                                                 levels = levels
                                             )
-                                            Log.d("nierozumiem", levelNumber.toString())
                                             fields = startService.getFields(levelNumber)
-                                            Log.d("nierozumiem", fields[0])
                                             visible2 = true
                                             visible3 = false
                                             visible4 = false
@@ -117,11 +115,12 @@ fun StartScreen(navController: NavController) {
                                 onValueChanged = {
                                     scope.launch {
                                         try {
-                                            cycles = startService.getCycles(
+                                            val cycles = startService.getCycles(
                                                 level = levelNumber,
                                                 field = sharedPreferencesManager
                                                     .getData("field", "")
                                             )
+                                            cyclesDisplay = getDisplayedCycles(cycles)
                                             visible3 = true
                                             visible4 = false
                                             sharedPreferencesManager.saveData("cycle", "")
@@ -134,25 +133,29 @@ fun StartScreen(navController: NavController) {
                             StartProgramChoice(
                                 text = "Wybierz cykl kształcenia",
                                 visibility = visible3,
-                                possibilities = cycles,
+                                possibilities = cyclesDisplay,
                                 key = "cycle",
                                 onClick = {
                                     visible4 = false
                                 },
                                 onValueChanged = {
                                     scope.launch {
-                                        visible4 = true
-                                        sharedPreferencesManager.saveData("specialization", "")
-                                        specializations = startService.getSpecializations(
-                                            level = levelNumber,
-                                            field = sharedPreferencesManager
-                                                .getData("field", ""),
-                                            cycle = sharedPreferencesManager
-                                                .getData("cycle", "")
-                                        )
-                                        Log.d("specsize", specializations.size.toString())
-                                        if (specializations.size == 0) {
-                                            navController.navigate(Screen.MenuScreen.route)
+                                        try {
+                                            specializations = startService.getSpecializations(
+                                                level = levelNumber,
+                                                field = sharedPreferencesManager
+                                                    .getData("field", ""),
+                                                cycle = makeCycleInt(
+                                                    sharedPreferencesManager
+                                                        .getData("cycle", "")
+                                                )
+                                            )
+                                            visible4 = true
+                                            sharedPreferencesManager.saveData("specialization", "")
+                                            if (specializations.size == 0) {
+                                                navController.navigate(Screen.MenuScreen.route)
+                                            }
+                                        } catch (_: Exception) {
                                         }
                                     }
                                 }
@@ -262,4 +265,18 @@ fun getLevelInt(sharedPreferencesManager: SharedPreferencesManager, levels: List
         }
     }
     return -1
+}
+
+fun getDisplayedCycles(cyclesInt: SnapshotStateList<Int>): SnapshotStateList<String> {
+    val displayCyclesList = mutableStateListOf<String>()
+    for (cycle in cyclesInt) {
+        var cycleText = cycle.toString()
+        cycleText += "/${cycle + 1}"
+        displayCyclesList.add(cycleText)
+    }
+    return displayCyclesList
+}
+
+fun makeCycleInt(cycle: String): Int {
+    return Integer.parseInt(cycle.split("/")[0])
 }
