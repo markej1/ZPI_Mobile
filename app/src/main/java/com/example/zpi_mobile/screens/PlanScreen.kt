@@ -184,7 +184,7 @@ fun SubjectTile(
             }
                   },
         colors = CardDefaults.cardColors(
-                        containerColor = cardColor(type = subjects[index].block_type)
+                        containerColor = cardColor(type = block.block_type)
                  ),
         modifier = Modifier
             .fillMaxWidth()
@@ -346,7 +346,7 @@ fun PlanViewAll(
                         }
                               },
                     colors = CardDefaults.cardColors(
-                        containerColor = cardColor(type = subjects[index].block_type)
+                        containerColor = cardColor(type = blocks[index].block_type)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()

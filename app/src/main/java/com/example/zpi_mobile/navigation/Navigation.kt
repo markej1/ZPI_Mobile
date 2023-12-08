@@ -12,16 +12,13 @@ fun Navigation(
     subjectService: SubjectService
 ) {
     val navController = rememberNavController()
-//    NavHost(navController = navController, startDestination = Screen.StartScreen.route) {
-    NavHost(navController = navController, startDestination = Screen.PlanScreen.route) {
+    NavHost(navController = navController, startDestination = Screen.StartScreen.route) {
+
         composable(route = Screen.StartScreen.route) {
             StartScreen(navController = navController)
         }
         composable(route = Screen.MenuScreen.route) {
             MenuScreen(navController = navController)
-        }
-        composable(route = Screen.PlanScreen.route) {
-            PlanScreen(navController = navController)
         }
         composable(route = Screen.HelpScreen.route) {
             HelpScreen()
