@@ -3,6 +3,7 @@
 package com.example.zpi_mobile.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,6 +52,7 @@ fun StartScreen(navController: NavController) {
     var specializations = remember { mutableStateListOf<String>() }
 
     val levelNames = levels.map { it.levelName }
+    var levelNumber by remember { mutableStateOf(0) }
 
     val scope = rememberCoroutineScope()
 
@@ -86,15 +88,19 @@ fun StartScreen(navController: NavController) {
                                 visibility = true,
                                 possibilities = levelNames,
                                 key = "level",
+                                onClick = {
+                                    visible2 = false
+                                },
                                 onValueChanged = {
                                     scope.launch {
                                         try {
-                                            fields = startService.getFields(
-                                                getLevelInt(
-                                                    sharedPreferencesManager = sharedPreferencesManager,
-                                                    levels = levels
-                                                )
+                                            levelNumber = getLevelInt(
+                                                sharedPreferencesManager = sharedPreferencesManager,
+                                                levels = levels
                                             )
+                                            Log.d("nierozumiem", levelNumber.toString())
+                                            fields = startService.getFields(levelNumber)
+                                            Log.d("nierozumiem", fields[0])
                                             visible2 = true
                                             visible3 = false
                                             visible4 = false
@@ -110,12 +116,21 @@ fun StartScreen(navController: NavController) {
                                 visibility = visible2,
                                 possibilities = fields,
                                 key = "field",
-                                onClick = {
-                                    visible3 = true
-                                    visible4 = false
-                                    sharedPreferencesManager.saveData("cycle", "")
-                                    sharedPreferencesManager.saveData("specialization", "")
-                                    cycles = startService.getCycles()
+                                onClick = {},
+                                onValueChanged = {
+                                    scope.launch {
+                                        try {
+                                            cycles = startService.getCycles(
+                                                level = levelNumber,
+                                                field = sharedPreferencesManager
+                                                    .getData("field","")
+                                            )
+                                            visible3 = true
+                                            visible4 = false
+                                            sharedPreferencesManager.saveData("cycle", "")
+                                            sharedPreferencesManager.saveData("specialization", "")
+                                        } catch (_: Exception) {}
+                                    }
                                 }
                             )
                             StartProgramChoice(
