@@ -23,19 +23,37 @@ class StartService {
             .getHttpClient()
             .get("https://susel.pythonanywhere.com/list-field/$level/")
             .body()
-        val fieldsMutableStateList = mutableStateListOf<String>()
-        for (field in fields) {
-            fieldsMutableStateList.add(field)
-        }
-        return fieldsMutableStateList
+        return getMutableStateListFromList(fields)
     }
 
-    fun getCycles(): SnapshotStateList<String> {
-        return mutableStateListOf("2020/2021", "2021/2022", "2022/2023", "2023/2024")
+    suspend fun getCycles(level: Int, field: String): SnapshotStateList<String> {
+        val cycles: List<String> = httpClient
+            .getHttpClient()
+            .get("https://susel.pythonanywhere.com/list-cycle/$level/${removeWrongSigns(field)}/")
+            .body()
+
+        return getMutableStateListFromList(cycles)
+//        return mutableStateListOf("2020/2021", "2021/2022", "2022/2023", "2023/2024")
     }
 
     fun getSpecializations(): SnapshotStateList<String> {
-        return mutableStateListOf("ZSTI", "PSI", "IO")
+        return mutableStateListOf("")
+    }
+
+    private fun removeWrongSigns(text: String): String {
+        return text
+            .split(" ")
+            .joinToString(separator = "_")
+            .split("/")
+            .joinToString(separator = "_")
+    }
+
+    private fun getMutableStateListFromList(list: List<String>): SnapshotStateList<String> {
+        val mutableStateList = mutableStateListOf<String>()
+        for (element in list) {
+            mutableStateList.add(element)
+        }
+        return mutableStateList
     }
 
 }
