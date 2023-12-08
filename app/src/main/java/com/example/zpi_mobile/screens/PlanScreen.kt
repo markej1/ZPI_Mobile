@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -89,7 +90,8 @@ fun PlanScreen(
                 Text(
                     text = SharedPreferencesManager(LocalContext.current)
                         .getData("field", ""),
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
                 )
             }
             Box(
@@ -170,6 +172,9 @@ fun SubjectTile(
     subjectService: SubjectService,
     navController: NavController
 ) {
+    var textStyleBody = MaterialTheme.typography.bodySmall
+    var textStyle by remember { mutableStateOf(textStyleBody) }
+    var readyToDraw by remember { mutableStateOf(false) }
     Card(
         onClick = {
             subjectService.chooseBlock(block)
@@ -195,7 +200,8 @@ fun SubjectTile(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .heightIn(min = 120.dp, max = 120.dp),
+                .heightIn(min = 160.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
                 modifier = Modifier
@@ -207,11 +213,13 @@ fun SubjectTile(
                 Text(
                     text = block.ects + " ECTS",
                     textAlign = TextAlign.Start,
+                    style = textStyle,
                     modifier = Modifier
                 )
                 Text(
                     text = block.exam,
                     textAlign = TextAlign.End,
+                    style = textStyle,
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(align = Alignment.End)
@@ -221,18 +229,31 @@ fun SubjectTile(
                 text = if(!isInSelectDialog) block.name else block.subjects[id].name,
                 maxLines = 4,
                 textAlign = TextAlign.Center,
+                style = textStyle,
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
+                    .wrapContentWidth(Alignment.CenterHorizontally),
+
             )
             Text(
                 text = block.hours,
                 textAlign = TextAlign.Center,
+                style = textStyle,
                 modifier = Modifier
                     .fillMaxSize()
                     .wrapContentSize(Alignment.BottomCenter)
                     .padding(bottom = 8.dp)
+                    .drawWithContent {
+                        if (readyToDraw) drawContent()
+                    },
+                onTextLayout = { textLayoutResult ->
+                    if (textLayoutResult.didOverflowHeight) {
+                        textStyle = textStyle.copy(fontSize = textStyle.fontSize * 0.95)
+                    } else {
+                        readyToDraw = true
+                    }
+                }
             )
         }
     }
