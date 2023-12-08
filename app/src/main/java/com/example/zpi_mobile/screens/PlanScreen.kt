@@ -18,14 +18,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.zpi_mobile.R
+import com.example.zpi_mobile.SharedPreferencesManager
 import com.example.zpi_mobile.model.Block
+import com.example.zpi_mobile.navigation.Screen
 import com.example.zpi_mobile.services.SubjectService
+import com.example.zpi_mobile.ui.theme.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -56,13 +63,12 @@ fun PlanScreen(
     Scaffold(
         floatingActionButton = {
             SmallFloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = { navController.navigate(Screen.HelpScreen.route) },
                 shape = CircleShape,
-                modifier = Modifier.size(75.dp)
+                modifier = Modifier.size(60.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Info,
-//                    painter = painterResource(id = R.drawable.question_mark),
+                    painter = painterResource(id = R.drawable.question_mark),
                     contentDescription = "question_mark"
                 )
             }
@@ -76,21 +82,21 @@ fun PlanScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.Green)
-                    .padding(0.dp, 15.dp),
+                    .background(TitleColor)
+                    .padding(0.dp, 14.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Informatyka Stosowana",
-                    color = Color.Black,
-                    fontSize = 32.sp
+                    text = SharedPreferencesManager(LocalContext.current)
+                        .getData("field", ""),
+                    style = MaterialTheme.typography.titleLarge
                 )
             }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = Color.Gray)
-                    .padding(0.dp, 15.dp)
+                    .background(color = ChangeColor)
+                    .padding(0.dp, 10.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -114,7 +120,7 @@ fun PlanScreen(
                     }
                     Text(
                         text = semester,
-                        fontSize = 24.sp
+                        style = MaterialTheme.typography.bodyLarge
                     )
                     IconButton(
                         enabled = pagerState.currentPage != semesters.size - 1,
@@ -178,8 +184,8 @@ fun SubjectTile(
             }
                   },
         colors = CardDefaults.cardColors(
-            containerColor = Color.Yellow
-        ),
+                        containerColor = cardColor(type = subjects[index].block_type)
+                 ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
@@ -238,12 +244,77 @@ fun PlanViewSemester(
     navController: NavController
 ) {
     val subjects: List<Block> = subjectService.getBlocks()
+    val textStyle: TextStyle = MaterialTheme.typography.bodySmall
     Box(contentAlignment = Alignment.TopCenter) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 128.dp),
+            columns = GridCells.Adaptive(minSize = 164.dp),
         ) {
             items(subjects.size) { index ->
+
                SubjectTile(false, 0, subjects[index], subjectService, navController)
+
+//                 Card(
+//                     onClick = {},
+//                     colors = CardDefaults.cardColors(
+//                         containerColor = cardColor(type = subjects[index].block_type)
+//                     ),
+//                     modifier = Modifier
+//                         .fillMaxWidth()
+//                         .padding(8.dp),
+//                     elevation = CardDefaults.cardElevation(4.dp),
+//                     shape = MaterialTheme.shapes.medium
+//                 ) {
+//                     Column(
+//                         modifier = Modifier
+//                             .fillMaxSize()
+//                             .heightIn(min = 160.dp),
+//                         verticalArrangement = Arrangement.SpaceBetween
+//                     ) {
+//                         Row(
+//                             modifier = Modifier
+//                                 .padding(horizontal = 8.dp)
+//                                 .padding(top = 8.dp)
+//                                 .fillMaxWidth()
+//                                 .wrapContentWidth()
+//                         ) {
+//                             Text(
+//                                 text = subjects[index].ects + " ECTS",
+//                                 style = textStyle,
+//                                 textAlign = TextAlign.Start,
+//                                 modifier = Modifier
+
+//                             )
+//                             Text(
+//                                 text = subjects[index].exam,
+//                                 style = textStyle,
+//                                 textAlign = TextAlign.End,
+//                                 modifier = Modifier
+//                                     .fillMaxWidth()
+//                                     .wrapContentWidth(align = Alignment.End)
+//                             )
+//                         }
+//                         Text(
+//                             text = subjects[index].name,
+//                             style = textStyle,
+//                             maxLines = 4,
+//                             textAlign = TextAlign.Center,
+//                             modifier = Modifier
+//                                 .padding(horizontal = 8.dp)
+//                                 .fillMaxWidth()
+//                                 .wrapContentWidth(Alignment.CenterHorizontally)
+//                         )
+//                         Text(
+//                             text = subjects[index].hours,
+//                             style = textStyle,
+//                             textAlign = TextAlign.Center,
+//                             modifier = Modifier
+//                                 .fillMaxSize()
+//                                 .wrapContentSize(Alignment.BottomCenter)
+//                                 .padding(bottom = 8.dp)
+//                         )
+//                     }
+//                 }
+
             }
         }
     }
@@ -275,7 +346,7 @@ fun PlanViewAll(
                         }
                               },
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.Blue
+                        containerColor = cardColor(type = subjects[index].block_type)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -286,14 +357,15 @@ fun PlanViewAll(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .heightIn(min = 120.dp),
+                            .heightIn(min = 110.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = blocks[index].name,
                             maxLines = 4,
                             modifier = Modifier.padding(8.dp),
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
@@ -301,6 +373,7 @@ fun PlanViewAll(
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -324,6 +397,22 @@ fun SubjectSelect(
                 }
             }
         }
+    }
+}
+
+
+@Composable
+fun cardColor(type: String): Color {
+    return when (type) {
+        "przedmiot kierunkowy" -> przedmiotKierunkowy
+        "przedmiot specjalnościowy" -> przedmiotSpecjalnosciowy
+        "przedmiot nauk podstawowych" -> przedmiotNaukPodstawowych
+        "przedmiot kształcenia ogólnego" -> przedmiotKsztalceniaOgolnego
+        "blok kierunkowy" -> blokKierunkowy
+        "blok specjalnościowy" -> blokSpecjalnosciowy
+        "blok kształcenia ogólnego" -> blokKsztalceniaOgolnego
+        "blok nauk podstawowych" -> blokNaukPodstawowych
+        else -> Color.Black
     }
 }
 
