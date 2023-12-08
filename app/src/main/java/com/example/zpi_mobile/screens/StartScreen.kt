@@ -57,12 +57,6 @@ fun StartScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
 
     Scaffold(
-//        topBar = {
-//            CenterAlignedTopAppBar(
-//                title = { Text(text = "Programy studiów", color = Color.Black) },
-//                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xff0f9d58)),
-//            )
-//        },
         content = {
             Box(modifier = Modifier.background(StartBackgroundColor)) {
                 Box(
@@ -107,7 +101,8 @@ fun StartScreen(navController: NavController) {
                                             sharedPreferencesManager.saveData("field", "")
                                             sharedPreferencesManager.saveData("cycle", "")
                                             sharedPreferencesManager.saveData("specialization", "")
-                                        } catch (_: Exception) {}
+                                        } catch (_: Exception) {
+                                        }
                                     }
                                 }
                             )
@@ -116,20 +111,23 @@ fun StartScreen(navController: NavController) {
                                 visibility = visible2,
                                 possibilities = fields,
                                 key = "field",
-                                onClick = {},
+                                onClick = {
+                                    visible3 = false
+                                },
                                 onValueChanged = {
                                     scope.launch {
                                         try {
                                             cycles = startService.getCycles(
                                                 level = levelNumber,
                                                 field = sharedPreferencesManager
-                                                    .getData("field","")
+                                                    .getData("field", "")
                                             )
                                             visible3 = true
                                             visible4 = false
                                             sharedPreferencesManager.saveData("cycle", "")
                                             sharedPreferencesManager.saveData("specialization", "")
-                                        } catch (_: Exception) {}
+                                        } catch (_: Exception) {
+                                        }
                                     }
                                 }
                             )
@@ -139,9 +137,24 @@ fun StartScreen(navController: NavController) {
                                 possibilities = cycles,
                                 key = "cycle",
                                 onClick = {
-                                    visible4 = true
-                                    sharedPreferencesManager.saveData("specialization", "")
-                                    specializations = startService.getSpecializations()
+                                    visible4 = false
+                                },
+                                onValueChanged = {
+                                    scope.launch {
+                                        visible4 = true
+                                        sharedPreferencesManager.saveData("specialization", "")
+                                        specializations = startService.getSpecializations(
+                                            level = levelNumber,
+                                            field = sharedPreferencesManager
+                                                .getData("field", ""),
+                                            cycle = sharedPreferencesManager
+                                                .getData("cycle", "")
+                                        )
+                                        Log.d("specsize", specializations.size.toString())
+                                        if (specializations.size == 0) {
+                                            navController.navigate(Screen.MenuScreen.route)
+                                        }
+                                    }
                                 }
                             )
                             StartProgramChoice(

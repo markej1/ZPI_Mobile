@@ -36,8 +36,14 @@ class StartService {
 //        return mutableStateListOf("2020/2021", "2021/2022", "2022/2023", "2023/2024")
     }
 
-    fun getSpecializations(): SnapshotStateList<String> {
-        return mutableStateListOf("")
+    suspend fun getSpecializations(level: Int, field: String, cycle: String): SnapshotStateList<String> {
+        val specializations: List<String> = httpClient
+            .getHttpClient()
+            .get("https://susel.pythonanywhere.com/list-specialization/$level/${removeWrongSigns(field)}/$cycle/")
+            .body()
+
+        return getMutableStateListFromList(specializations)
+//        return mutableStateListOf()
     }
 
     private fun removeWrongSigns(text: String): String {
@@ -57,3 +63,19 @@ class StartService {
     }
 
 }
+
+//private fun getStringMutableStateListFromList(list: List<String>): SnapshotStateList<String> {
+//    val mutableStateList = mutableStateListOf<String>()
+//    for (element in list) {
+//        mutableStateList.add(element)
+//    }
+//    return mutableStateList
+//}
+//
+//private fun getIntMutableStateListFromList(list: List<Int>): SnapshotStateList<Int> {
+//    val mutableStateList = mutableStateListOf<Int>()
+//    for (element in list) {
+//        mutableStateList.add(element)
+//    }
+//    return mutableStateList
+//}
