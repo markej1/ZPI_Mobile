@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +30,7 @@ import com.example.zpi_mobile.http.receive.StartService
 import com.example.zpi_mobile.model.Level
 import com.example.zpi_mobile.navigation.Screen
 import com.example.zpi_mobile.ui.theme.StartBackgroundColor
+import com.example.zpi_mobile.ui.theme.StatusBarColor
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -57,126 +59,153 @@ fun StartScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
 
     val loading = startService.loading
+    var blurPower: Int
 
     Scaffold(
         content = {
             Box(modifier = Modifier.background(StartBackgroundColor)) {
+                blurPower = if (loading.value) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.then(Modifier.size(64.dp)),
+                            color = StatusBarColor,
+                            strokeWidth = 8.dp
+                        )
+                    }
+                    10
+                } else {
+                    0
+                }
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(0.dp, 50.dp)
+                        .blur(blurPower.dp)
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(70.dp)
+                    Box(
+                        modifier = Modifier
+                            .padding(0.dp, 50.dp)
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.title_logo),
-                            contentDescription = "logo"
-                        )
-                        Text(
-                            text = "Programy studiów",
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Column {
-                            StartProgramChoice(
-                                text = "Wybierz stopień studiów",
-                                visibility = true,
-                                possibilities = levelNames,
-                                key = "level",
-                                onClick = {
-                                    visible2 = false
-                                },
-                                onValueChanged = {
-                                    scope.launch {
-                                        try {
-                                            levelNumber = getLevelInt(
-                                                sharedPreferencesManager = sharedPreferencesManager,
-                                                levels = levels
-                                            )
-                                            fields = startService.getFields(levelNumber)
-                                            visible2 = true
-                                            visible3 = false
-                                            visible4 = false
-                                            sharedPreferencesManager.saveData("field", "")
-                                            sharedPreferencesManager.saveData("cycle", "")
-                                            sharedPreferencesManager.saveData("specialization", "")
-                                        } catch (_: Exception) {
-                                        }
-                                    }
-                                }
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(70.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.title_logo),
+                                contentDescription = "logo"
                             )
-                            StartProgramChoice(
-                                text = "Wybierz kierunek studiów",
-                                visibility = visible2,
-                                possibilities = fields,
-                                key = "field",
-                                onClick = {
-                                    visible3 = false
-                                },
-                                onValueChanged = {
-                                    scope.launch {
-                                        try {
-                                            val cycles = startService.getCycles(
-                                                level = levelNumber,
-                                                field = sharedPreferencesManager
-                                                    .getData("field", "")
-                                            )
-                                            cyclesDisplay = getDisplayedCycles(cycles)
-                                            visible3 = true
-                                            visible4 = false
-                                            sharedPreferencesManager.saveData("cycle", "")
-                                            sharedPreferencesManager.saveData("specialization", "")
-                                        } catch (_: Exception) {
-                                        }
-                                    }
-                                }
+                            Text(
+                                text = "Programy studiów",
+                                style = MaterialTheme.typography.titleLarge
                             )
-                            StartProgramChoice(
-                                text = "Wybierz cykl kształcenia",
-                                visibility = visible3,
-                                possibilities = cyclesDisplay,
-                                key = "cycle",
-                                onClick = {
-                                    visible4 = false
-                                },
-                                onValueChanged = {
-                                    scope.launch {
-                                        try {
-                                            specializations = startService.getSpecializations(
-                                                level = levelNumber,
-                                                field = sharedPreferencesManager
-                                                    .getData("field", ""),
-                                                cycle = makeCycleInt(
-                                                    sharedPreferencesManager
-                                                        .getData("cycle", "")
+                            Column {
+                                StartProgramChoice(
+                                    text = "Wybierz stopień studiów",
+                                    visibility = true,
+                                    possibilities = levelNames,
+                                    key = "level",
+                                    onClick = {
+                                        visible2 = false
+                                    },
+                                    onValueChanged = {
+                                        scope.launch {
+                                            try {
+                                                levelNumber = getLevelInt(
+                                                    sharedPreferencesManager = sharedPreferencesManager,
+                                                    levels = levels
                                                 )
-                                            )
-                                            visible4 = true
-                                            sharedPreferencesManager.saveData("specialization", "")
-                                            if (specializations.size == 0) {
-                                                navController.navigate(Screen.MenuScreen.route)
+                                                fields = startService.getFields(levelNumber)
+                                                visible2 = true
+                                                visible3 = false
+                                                visible4 = false
+                                                sharedPreferencesManager.saveData("field", "")
+                                                sharedPreferencesManager.saveData("cycle", "")
+                                                sharedPreferencesManager.saveData(
+                                                    "specialization",
+                                                    ""
+                                                )
+                                            } catch (_: Exception) {
                                             }
-                                        } catch (_: Exception) {
                                         }
                                     }
-                                }
-                            )
-                            StartProgramChoice(
-                                text = "Wybierz specjalność",
-                                visibility = visible4,
-                                possibilities = specializations,
-                                key = "specialization",
-                                onClick = {
-                                    navController.navigate(Screen.MenuScreen.route)
-                                }
-                            )
+                                )
+                                StartProgramChoice(
+                                    text = "Wybierz kierunek studiów",
+                                    visibility = visible2,
+                                    possibilities = fields,
+                                    key = "field",
+                                    onClick = {
+                                        visible3 = false
+                                    },
+                                    onValueChanged = {
+                                        scope.launch {
+                                            try {
+                                                val cycles = startService.getCycles(
+                                                    level = levelNumber,
+                                                    field = sharedPreferencesManager
+                                                        .getData("field", "")
+                                                )
+                                                cyclesDisplay = getDisplayedCycles(cycles)
+                                                visible3 = true
+                                                visible4 = false
+                                                sharedPreferencesManager.saveData("cycle", "")
+                                                sharedPreferencesManager.saveData(
+                                                    "specialization",
+                                                    ""
+                                                )
+                                            } catch (_: Exception) {
+                                            }
+                                        }
+                                    }
+                                )
+                                StartProgramChoice(
+                                    text = "Wybierz cykl kształcenia",
+                                    visibility = visible3,
+                                    possibilities = cyclesDisplay,
+                                    key = "cycle",
+                                    onClick = {
+                                        visible4 = false
+                                    },
+                                    onValueChanged = {
+                                        scope.launch {
+                                            try {
+                                                specializations = startService.getSpecializations(
+                                                    level = levelNumber,
+                                                    field = sharedPreferencesManager
+                                                        .getData("field", ""),
+                                                    cycle = makeCycleInt(
+                                                        sharedPreferencesManager
+                                                            .getData("cycle", "")
+                                                    )
+                                                )
+                                                visible4 = true
+                                                sharedPreferencesManager.saveData(
+                                                    "specialization",
+                                                    ""
+                                                )
+                                                if (specializations.size == 0) {
+                                                    navController.navigate(Screen.MenuScreen.route)
+                                                }
+                                            } catch (_: Exception) {
+                                            }
+                                        }
+                                    }
+                                )
+                                StartProgramChoice(
+                                    text = "Wybierz specjalność",
+                                    visibility = visible4,
+                                    possibilities = specializations,
+                                    key = "specialization",
+                                    onClick = {
+                                        navController.navigate(Screen.MenuScreen.route)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
-            }
-            if (loading.value) {
-                CircularProgressIndicator()
             }
         }
     )
