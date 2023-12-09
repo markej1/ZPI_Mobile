@@ -56,6 +56,8 @@ fun StartScreen(navController: NavController) {
 
     val scope = rememberCoroutineScope()
 
+    val loading = startService.loading
+
     Scaffold(
         content = {
             Box(modifier = Modifier.background(StartBackgroundColor)) {
@@ -172,6 +174,9 @@ fun StartScreen(navController: NavController) {
                         }
                     }
                 }
+            }
+            if (loading.value) {
+                CircularProgressIndicator()
             }
         }
     )
