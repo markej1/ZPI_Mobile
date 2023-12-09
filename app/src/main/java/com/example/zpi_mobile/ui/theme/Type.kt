@@ -25,7 +25,7 @@ val Typography = Typography(
         fontFamily = Alata,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        lineHeight = 20.sp,
+        lineHeight = 16.sp,
         letterSpacing = 0.3.sp
     ),
     titleLarge = TextStyle(
@@ -38,8 +38,8 @@ val Typography = Typography(
     titleSmall = TextStyle(
         fontFamily = Jura,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp,
-        lineHeight = 24.sp,
+        fontSize = 18.sp,
+        lineHeight = 22.sp,
         letterSpacing = 0.5.sp
     ),
     titleMedium = TextStyle(

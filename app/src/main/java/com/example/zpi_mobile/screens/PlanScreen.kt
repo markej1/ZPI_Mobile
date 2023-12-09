@@ -5,17 +5,23 @@ package com.example.zpi_mobile.screens
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -36,7 +42,10 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun PlanScreen(navController: NavController) {
+fun PlanScreen(
+    subjectService: SubjectService,
+    navController: NavController
+) {
     val semesters = listOf(
         "Wszystko",
         "Semestr 1.",
@@ -81,7 +90,8 @@ fun PlanScreen(navController: NavController) {
                 Text(
                     text = SharedPreferencesManager(LocalContext.current)
                         .getData("field", ""),
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
                 )
             }
             Box(
@@ -132,6 +142,9 @@ fun PlanScreen(navController: NavController) {
                 }
             }
             Box {
+                if (subjectService.isDialogShown) {
+                    SubjectSelect(subjectService, navController)
+                }
                 HorizontalPager(
                     count = semesters.size,
                     state = pagerState,
@@ -141,21 +154,116 @@ fun PlanScreen(navController: NavController) {
                         .fillMaxSize()
                 ) { index ->
                     when (index) {
-                        0 -> PlanViewAll()
-                        else -> PlanViewSemester()
+                        0 -> PlanViewAll(subjectService, navController)
+                        else -> PlanViewSemester(subjectService, navController)
                     }
                 }
             }
         }
-
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlanViewSemester() {
-    val subjectService = SubjectService()
+fun SubjectTile(
+    isInSelectDialog: Boolean,
+    id: Int,
+    block: Block,
+    subjectService: SubjectService,
+    navController: NavController
+) {
+    var textStyleBody = MaterialTheme.typography.bodySmall
+    var textStyle by remember { mutableStateOf(textStyleBody) }
+    var readyToDraw by remember { mutableStateOf(false) }
+    Card(
+        onClick = {
+            subjectService.chooseBlock(block)
+            if (block.subjects.size > 1 && !isInSelectDialog) {
+                subjectService.showDialog(block)
+            } else {
+                val subject = subjectService.getSubjectByName(block.subjects[id].name, block)
+                if (subject != null) {
+                    subjectService.chooseSubject(subject)
+                    navController.navigate("subject_card_screen")
+                }
+            }
+                  },
+        colors = CardDefaults.cardColors(
+                        containerColor = cardColor(type = block.block_type)
+                 ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .heightIn(min = 160.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .padding(top = 8.dp)
+                    .fillMaxWidth()
+                    .wrapContentWidth()
+            ){
+                Text(
+                    text = block.ects + " ECTS",
+                    textAlign = TextAlign.Start,
+                    style = textStyle,
+                    modifier = Modifier
+                )
+                Text(
+                    text = block.exam,
+                    textAlign = TextAlign.End,
+                    style = textStyle,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(align = Alignment.End)
+                )
+            }
+            Text(
+                text = if(!isInSelectDialog) block.name else block.subjects[id].name,
+                maxLines = 4,
+                textAlign = TextAlign.Center,
+                style = textStyle,
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.CenterHorizontally),
+
+            )
+            Text(
+                text = block.hours,
+                textAlign = TextAlign.Center,
+                style = textStyle,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp)
+                    .drawWithContent {
+                        if (readyToDraw) drawContent()
+                    },
+                onTextLayout = { textLayoutResult ->
+                    if (textLayoutResult.didOverflowHeight) {
+                        textStyle = textStyle.copy(fontSize = textStyle.fontSize * 0.95)
+                    } else {
+                        readyToDraw = true
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun PlanViewSemester(
+    subjectService: SubjectService,
+    navController: NavController
+) {
     val subjects: List<Block> = subjectService.getBlocks()
     val textStyle: TextStyle = MaterialTheme.typography.bodySmall
     Box(contentAlignment = Alignment.TopCenter) {
@@ -163,67 +271,71 @@ fun PlanViewSemester() {
             columns = GridCells.Adaptive(minSize = 164.dp),
         ) {
             items(subjects.size) { index ->
-                Card(
-                    onClick = {},
-                    colors = CardDefaults.cardColors(
-                        containerColor = cardColor(type = subjects[index].block_type)
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    elevation = CardDefaults.cardElevation(4.dp),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .heightIn(min = 160.dp),
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .padding(top = 8.dp)
-                                .fillMaxWidth()
-                                .wrapContentWidth()
-                        ) {
-                            Text(
-                                text = subjects[index].ects + " ECTS",
-                                style = textStyle,
-                                textAlign = TextAlign.Start,
-                                modifier = Modifier
 
-                            )
-                            Text(
-                                text = subjects[index].exam,
-                                style = textStyle,
-                                textAlign = TextAlign.End,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentWidth(align = Alignment.End)
-                            )
-                        }
-                        Text(
-                            text = subjects[index].name,
-                            style = textStyle,
-                            maxLines = 4,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .fillMaxWidth()
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        )
-                        Text(
-                            text = subjects[index].hours,
-                            style = textStyle,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .wrapContentSize(Alignment.BottomCenter)
-                                .padding(bottom = 8.dp)
-                        )
-                    }
-                }
+               SubjectTile(false, 0, subjects[index], subjectService, navController)
+
+//                 Card(
+//                     onClick = {},
+//                     colors = CardDefaults.cardColors(
+//                         containerColor = cardColor(type = subjects[index].block_type)
+//                     ),
+//                     modifier = Modifier
+//                         .fillMaxWidth()
+//                         .padding(8.dp),
+//                     elevation = CardDefaults.cardElevation(4.dp),
+//                     shape = MaterialTheme.shapes.medium
+//                 ) {
+//                     Column(
+//                         modifier = Modifier
+//                             .fillMaxSize()
+//                             .heightIn(min = 160.dp),
+//                         verticalArrangement = Arrangement.SpaceBetween
+//                     ) {
+//                         Row(
+//                             modifier = Modifier
+//                                 .padding(horizontal = 8.dp)
+//                                 .padding(top = 8.dp)
+//                                 .fillMaxWidth()
+//                                 .wrapContentWidth()
+//                         ) {
+//                             Text(
+//                                 text = subjects[index].ects + " ECTS",
+//                                 style = textStyle,
+//                                 textAlign = TextAlign.Start,
+//                                 modifier = Modifier
+
+//                             )
+//                             Text(
+//                                 text = subjects[index].exam,
+//                                 style = textStyle,
+//                                 textAlign = TextAlign.End,
+//                                 modifier = Modifier
+//                                     .fillMaxWidth()
+//                                     .wrapContentWidth(align = Alignment.End)
+//                             )
+//                         }
+//                         Text(
+//                             text = subjects[index].name,
+//                             style = textStyle,
+//                             maxLines = 4,
+//                             textAlign = TextAlign.Center,
+//                             modifier = Modifier
+//                                 .padding(horizontal = 8.dp)
+//                                 .fillMaxWidth()
+//                                 .wrapContentWidth(Alignment.CenterHorizontally)
+//                         )
+//                         Text(
+//                             text = subjects[index].hours,
+//                             style = textStyle,
+//                             textAlign = TextAlign.Center,
+//                             modifier = Modifier
+//                                 .fillMaxSize()
+//                                 .wrapContentSize(Alignment.BottomCenter)
+//                                 .padding(bottom = 8.dp)
+//                         )
+//                     }
+//                 }
+
             }
         }
     }
@@ -231,17 +343,31 @@ fun PlanViewSemester() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlanViewAll() {
-    val subjectService = SubjectService()
-    val subjects: List<Block> = subjectService.getBlocks()
+fun PlanViewAll(
+    subjectService: SubjectService,
+    navController: NavController
+) {
+    val blocks: List<Block> = subjectService.getBlocks()
     Box(contentAlignment = Alignment.TopCenter) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 128.dp),
         ) {
-            items(subjects.size) { index ->
+            items(blocks.size) { index ->
                 Card(
+                    onClick = {
+                        subjectService.chooseBlock(blocks[index])
+                        if(blocks[index].subjects.size > 1) {
+                            subjectService.showDialog(blocks[index])
+                        } else {
+                            val subject = subjectService.getSubjectByName(blocks[index].subjects[0].name, blocks[index])
+                            if (subject != null) {
+                                subjectService.chooseSubject(subject)
+                                navController.navigate("subject_card_screen")
+                            }
+                        }
+                              },
                     colors = CardDefaults.cardColors(
-                        containerColor = cardColor(type = subjects[index].block_type)
+                        containerColor = cardColor(type = blocks[index].block_type)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -256,7 +382,7 @@ fun PlanViewAll() {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = subjects[index].name,
+                            text = blocks[index].name,
                             maxLines = 4,
                             modifier = Modifier.padding(8.dp),
                             textAlign = TextAlign.Center,
@@ -268,6 +394,33 @@ fun PlanViewAll() {
         }
     }
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SubjectSelect(
+    subjectService: SubjectService,
+    navController: NavController
+) {
+    val clickedBlock = subjectService.clickedBlock
+    val subjects = clickedBlock?.subjects
+
+    Dialog(
+        onDismissRequest = { subjectService.dismissDialog() },
+        properties = DialogProperties(dismissOnClickOutside = true)
+    ) {
+        Card {
+            LazyColumn(modifier = Modifier.padding(8.dp)) {
+                subjects?.size?.let {
+                    items(it) { index ->
+                        SubjectTile(true, index, clickedBlock, subjectService, navController)
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun cardColor(type: String): Color {
@@ -283,3 +436,4 @@ fun cardColor(type: String): Color {
         else -> Color.Black
     }
 }
+
