@@ -1,5 +1,7 @@
 package com.example.zpi_mobile.model
 
+import kotlinx.serialization.Serializable
+
 interface IBlock {
     val name: String
     val hours: String
@@ -9,6 +11,7 @@ interface IBlock {
     val subjects: List<Subject>
 }
 
+@Serializable
 data class Block(
     override val name: String,
     override val hours: String,

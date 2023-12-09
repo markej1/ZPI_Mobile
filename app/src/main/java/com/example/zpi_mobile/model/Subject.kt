@@ -1,5 +1,7 @@
 package com.example.zpi_mobile.model
 
+import kotlinx.serialization.Serializable
+
 interface ISubject {
     val id: Int
     val name: String
@@ -14,6 +16,7 @@ interface ISubject {
     val link: String
 }
 
+@Serializable
 data class Subject(
     override val id: Int,
     override val name: String,
