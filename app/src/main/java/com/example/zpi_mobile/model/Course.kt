@@ -1,43 +1,51 @@
 package com.example.zpi_mobile.model
 
+import kotlinx.serialization.Serializable
+
 interface Course {
-    val ECTS: String
-    val ZZU: String
-    val CNPS: String
-    val crediting: String
+    val ects: Int
+    val zzu: Int
+    val cnps: Int
+    val hasExam: Boolean
+    val inGroupCourse: Boolean
 }
-
+@Serializable
 data class Lecture(
-    override val ECTS: String,
-    override val ZZU: String,
-    override  val CNPS: String,
-    override val crediting: String
+    override val ects: Int,
+    override val zzu: Int,
+    override val cnps: Int,
+    override val hasExam: Boolean,
+    override val inGroupCourse: Boolean
 ): Course
-
+@Serializable
 data class Seminar(
-    override val ECTS: String,
-    override val ZZU: String,
-    override  val CNPS: String,
-    override val crediting: String
+    override val ects: Int,
+    override val zzu: Int,
+    override val cnps: Int,
+    override val hasExam: Boolean,
+    override val inGroupCourse: Boolean
 ): Course
-
+@Serializable
 data class Laboratory(
-    override val ECTS: String,
-    override val ZZU: String,
-    override  val CNPS: String,
-    override val crediting: String
+    override val ects: Int,
+    override val zzu: Int,
+    override val cnps: Int,
+    override val hasExam: Boolean,
+    override val inGroupCourse: Boolean
 ): Course
-
+@Serializable
 data class Classes(
-    override val ECTS: String,
-    override val ZZU: String,
-    override  val CNPS: String,
-    override val crediting: String
+    override val ects: Int,
+    override val zzu: Int,
+    override val cnps: Int,
+    override val hasExam: Boolean,
+    override val inGroupCourse: Boolean
 ): Course
-
+@Serializable
 data class Project(
-    override val ECTS: String,
-    override val ZZU: String,
-    override  val CNPS: String,
-    override val crediting: String
+    override val ects: Int,
+    override val zzu: Int,
+    override val cnps: Int,
+    override val hasExam: Boolean,
+    override val inGroupCourse: Boolean
 ): Course

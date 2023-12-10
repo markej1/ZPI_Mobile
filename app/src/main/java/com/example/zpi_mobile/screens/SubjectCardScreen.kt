@@ -61,12 +61,12 @@ fun SubjectCardScreen(
         LazyColumn {
             items(1) {
                 SubjectInfo(subjectService, textStyle)
-                ListItem("Wykład", subjectService.chosenSubject!!.lecture, textStyle)
-                ListItem("Ćwiczenia", subjectService.chosenSubject!!.classes, textStyle)
-                ListItem("Laboratorium", subjectService.chosenSubject!!.laboratory, textStyle)
-                ListItem("Seminarium", subjectService.chosenSubject!!.seminar, textStyle)
-                ListItem("Projekt", subjectService.chosenSubject!!.project, textStyle)
-                ProgrammeContent(programmeContent = subjectService.chosenSubject!!.programme_content, textStyle)
+//                ListItem("Wykład", subjectService.chosenSubject!!.lecture, textStyle)
+//                ListItem("Ćwiczenia", subjectService.chosenSubject!!.classes, textStyle)
+//                ListItem("Laboratorium", subjectService.chosenSubject!!.laboratory, textStyle)
+//                ListItem("Seminarium", subjectService.chosenSubject!!.seminar, textStyle)
+//                ListItem("Projekt", subjectService.chosenSubject!!.project, textStyle)
+                ProgrammeContent(programmeContent = subjectService.chosenSubject!!.curriculumContent, textStyle)
                 Link("https://wit.pwr.edu.pl/studenci/programy-studiow/2023-2024-studia-i-stopnia", textStyle)
             }
         }
@@ -81,12 +81,12 @@ fun SubjectInfo(
     ElevatedCard(modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
         Row(modifier = Modifier.padding(all = 10.dp)) {
             Text(text = "Rodzaj przedmiotu:", style = textStyle)
-            Text(text = subjectService.chosenSubject!!.kind_of_subject,
-                style = textStyle,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.End)
-            )
+//            Text(text = subjectService.chosenSubject!!.kind_of_subject,
+//                style = textStyle,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentWidth(Alignment.End)
+//            )
         }
     }
 }
@@ -166,7 +166,7 @@ fun ProgrammeContent(
             Text(text = "Treści programowe:", style = textStyle, modifier = Modifier.padding(bottom = 5.dp))
             programmeContent.forEach { item ->
                 Row {
-                    Text(text = if (i < 10) "$i.   " else "$i. ", style = textStyle)
+//                    Text(text = if (i < 10) "$i.   " else "$i. ", style = textStyle)
                     Text(text = item, style = textStyle)
                 }
                 i += 1
