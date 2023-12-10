@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -31,10 +30,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.zpi_mobile.model.Course
+import com.example.zpi_mobile.model.CourseDetails
 import com.example.zpi_mobile.services.SubjectService
 
 @Composable
@@ -61,12 +59,12 @@ fun SubjectCardScreen(
         LazyColumn {
             items(1) {
                 SubjectInfo(subjectService, textStyle)
-//                ListItem("Wykład", subjectService.chosenSubject!!.lecture, textStyle)
-//                ListItem("Ćwiczenia", subjectService.chosenSubject!!.classes, textStyle)
-//                ListItem("Laboratorium", subjectService.chosenSubject!!.laboratory, textStyle)
-//                ListItem("Seminarium", subjectService.chosenSubject!!.seminar, textStyle)
-//                ListItem("Projekt", subjectService.chosenSubject!!.project, textStyle)
-                ProgrammeContent(programmeContent = subjectService.chosenSubject!!.curriculumContent, textStyle)
+                ListItem("Wykład", subjectService.chosenSubject?.lecture, textStyle)
+                ListItem("Wykład", subjectService.chosenSubject?.classes, textStyle)
+                ListItem("Laboratorium", subjectService.chosenSubject?.laboratory, textStyle)
+                ListItem("Seminarium", subjectService.chosenSubject?.seminar, textStyle)
+                ListItem("Projekt", subjectService.chosenSubject?.project, textStyle)
+                ProgrammeContent(programmeContent = subjectService.chosenSubject?.curriculumContent, textStyle)
                 Link("https://wit.pwr.edu.pl/studenci/programy-studiow/2023-2024-studia-i-stopnia", textStyle)
             }
         }
@@ -94,7 +92,7 @@ fun SubjectInfo(
 @Composable
 fun ListItem(
     courseType: String,
-    course: Course,
+    course: CourseDetails?,
     textStyle: TextStyle
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -120,31 +118,31 @@ fun ListItem(
             if (expanded) {
                 Row {
                     Text(text = "Liczba godzin CNPS:", style = textStyle)
-                    Text(text = course.CNPS, style = textStyle, modifier = Modifier
+                    Text(text = course?.cnps.toString(), style = textStyle, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Liczba godzin ZZU:", style = textStyle)
-                    Text(text = course.ZZU, style = textStyle, modifier = Modifier
+                    Text(text = course?.zzu.toString(), style = textStyle, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Forma zaliczenia:", style = textStyle)
-                    Text(text = course.crediting, style = textStyle, modifier = Modifier
+                    Text(text = course?.hasExam.toString(), style = textStyle, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Punkty ECTS:", style = textStyle)
-                    Text(text = course.ECTS, style = textStyle, modifier = Modifier
+                    Text(text = course?.ects.toString(), style = textStyle, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Grupa kursów:", style = textStyle)
-                    Text(text = course.crediting, style = textStyle, modifier = Modifier
+                    Text(text = course?.inGroupCourse.toString(), style = textStyle, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
@@ -155,7 +153,7 @@ fun ListItem(
 
 @Composable
 fun ProgrammeContent(
-    programmeContent: List<String>,
+    programmeContent: List<String>?,
     textStyle: TextStyle
 ) {
     var i = 1
@@ -164,7 +162,7 @@ fun ProgrammeContent(
         .padding(horizontal = 10.dp, vertical = 5.dp)) {
         Column(modifier = Modifier.padding(all = 10.dp)) {
             Text(text = "Treści programowe:", style = textStyle, modifier = Modifier.padding(bottom = 5.dp))
-            programmeContent.forEach { item ->
+            programmeContent?.forEach { item ->
                 Row {
 //                    Text(text = if (i < 10) "$i.   " else "$i. ", style = textStyle)
                     Text(text = item, style = textStyle)

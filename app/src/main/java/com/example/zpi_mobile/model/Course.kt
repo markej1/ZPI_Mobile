@@ -1,51 +1,47 @@
 package com.example.zpi_mobile.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-interface Course {
-    val ects: Int
-    val zzu: Int
-    val cnps: Int
-    val hasExam: Boolean
-    val inGroupCourse: Boolean
+@Serializable
+data class CourseDetails(
+    val ects: Double,
+    val zzu: Double,
+    val cnps: Double,
+    val hasExam: Boolean,
+    val inGroupCourse: Boolean,
+    val hasCurriculum: Boolean
+)
+@Serializable
+sealed class ICourse {
+    abstract val type: String
+    @SerialName("detalis") abstract val details: CourseDetails
 }
 @Serializable
+@SerialName("Lecture")
 data class Lecture(
-    override val ects: Int,
-    override val zzu: Int,
-    override val cnps: Int,
-    override val hasExam: Boolean,
-    override val inGroupCourse: Boolean
-): Course
+    @SerialName("detalis")  override val details: CourseDetails, override val type: String
+): ICourse()
+
 @Serializable
+@SerialName("Seminar")
 data class Seminar(
-    override val ects: Int,
-    override val zzu: Int,
-    override val cnps: Int,
-    override val hasExam: Boolean,
-    override val inGroupCourse: Boolean
-): Course
+    @SerialName("detalis")  override val details: CourseDetails, override val type: String
+): ICourse()
+
 @Serializable
+@SerialName("Laboratory")
 data class Laboratory(
-    override val ects: Int,
-    override val zzu: Int,
-    override val cnps: Int,
-    override val hasExam: Boolean,
-    override val inGroupCourse: Boolean
-): Course
+    @SerialName("detalis")  override val details: CourseDetails, override val type: String
+): ICourse()
+
 @Serializable
+@SerialName("Classes")
 data class Classes(
-    override val ects: Int,
-    override val zzu: Int,
-    override val cnps: Int,
-    override val hasExam: Boolean,
-    override val inGroupCourse: Boolean
-): Course
+    @SerialName("detalis")  override val details: CourseDetails, override val type: String
+): ICourse()
+
 @Serializable
+@SerialName("Project")
 data class Project(
-    override val ects: Int,
-    override val zzu: Int,
-    override val cnps: Int,
-    override val hasExam: Boolean,
-    override val inGroupCourse: Boolean
-): Course
+    @SerialName("detalis")  override val details: CourseDetails, override val type: String
+): ICourse()

@@ -457,6 +457,28 @@ class SubjectService: ViewModel() {
         var semesterId = 1
         for (semester in semesters) {
             for (subject in semester) {
+                val courses: List<ICourse> = httpClient
+                    .getHttpClient()
+                    .get(_url + "desc/1/Informatyka_Stosowana/2023/${subject.moduleId}/${subject.subjectId}/" ).body()
+                for (course in courses) {
+                    when (course) {
+                        is Lecture -> {
+                            subject.lecture = course.details
+                        }
+                        is Classes -> {
+                            subject.classes = course.details
+                        }
+                        is Laboratory -> {
+                            subject.laboratory = course.details
+                        }
+                        is Seminar -> {
+                            subject.seminar = course.details
+                        }
+                        is Project -> {
+                            subject.project = course.details
+                        }
+                    }
+                }
                 subjects.add(subject)
                 val tempBlock = blocks.find { it.name == subject.module }
                 // jezeli w liscie blokow znajduje sie juz blok o danej nazwie to nalezy dodac ten przedmiot do listy przedmiotow w bloku
