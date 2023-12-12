@@ -7,7 +7,6 @@ interface ISubject {
 //    val kind_of_subject: String
 //    val link: String
     val name: String
-    val code: String
     val curriculumContent: Any
     val category: String
     val subjectId: String
@@ -18,13 +17,15 @@ interface ISubject {
     var seminar: CourseDetails?
     var laboratory: CourseDetails?
     var project: CourseDetails?
+    val hours: String
+    val ects: Int
+    val hasExam: Boolean
 }
 @Serializable
 data class Subject(
 //    override val kind_of_subject: String,
 //    override val link: String
     override val name: String,
-    override val code: String,
     override val curriculumContent: List<String>,
     override val category: String,
     override val subjectId: String,
@@ -34,6 +35,9 @@ data class Subject(
     override var classes: CourseDetails? = null,
     override var seminar: CourseDetails? = null,
     override var laboratory: CourseDetails? = null,
-    override var project: CourseDetails? = null
-): ISubject
+    override var project: CourseDetails? = null,
+    override val hours: String,
+    override val ects: Int,
+    override val hasExam: Boolean,
+    ): ISubject
 

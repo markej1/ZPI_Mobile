@@ -4,6 +4,7 @@ package com.example.zpi_mobile.screens
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,9 +60,9 @@ fun SubjectCardScreen(
         )
         LazyColumn {
             items(1) {
-                SubjectInfo(subjectService, textStyle)
+//                SubjectInfo(subjectService, textStyle)
                 ListItem("Wykład", subjectService.chosenSubject?.lecture, textStyle)
-                ListItem("Wykład", subjectService.chosenSubject?.classes, textStyle)
+                ListItem("Ćwiczenia", subjectService.chosenSubject?.classes, textStyle)
                 ListItem("Laboratorium", subjectService.chosenSubject?.laboratory, textStyle)
                 ListItem("Seminarium", subjectService.chosenSubject?.seminar, textStyle)
                 ListItem("Projekt", subjectService.chosenSubject?.project, textStyle)
@@ -118,33 +120,42 @@ fun ListItem(
             if (expanded) {
                 Row {
                     Text(text = "Liczba godzin CNPS:", style = textStyle)
-                    Text(text = course?.cnps.toString(), style = textStyle, modifier = Modifier
+                    Text(text = course?.cnps?.toString() ?: "", style = textStyle, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Liczba godzin ZZU:", style = textStyle)
-                    Text(text = course?.zzu.toString(), style = textStyle, modifier = Modifier
+                    Text(text = course?.zzu?.toString() ?: "", style = textStyle, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Forma zaliczenia:", style = textStyle)
-                    Text(text = course?.hasExam.toString(), style = textStyle, modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth(Alignment.End))
+                    if(course != null) {
+                        Text(
+                            text = course?.crediting.toString(),
+                            style = textStyle,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentWidth(Alignment.End)
+                        )
+                    }
                 }
                 Row {
                     Text(text = "Punkty ECTS:", style = textStyle)
-                    Text(text = course?.ects.toString(), style = textStyle, modifier = Modifier
+                    Text(text = course?.ects?.toString() ?: "", style = textStyle, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Grupa kursów:", style = textStyle)
-                    Text(text = course?.inGroupCourse.toString(), style = textStyle, modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth(Alignment.End))
+                    if(course != null) {
+                        Text(text = if (course.inGroupCourse) "Tak" else "Nie", style = textStyle, modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.End)
+                        )
+                    }
                 }
             }
         }
@@ -164,7 +175,7 @@ fun ProgrammeContent(
             Text(text = "Treści programowe:", style = textStyle, modifier = Modifier.padding(bottom = 5.dp))
             programmeContent?.forEach { item ->
                 Row {
-//                    Text(text = if (i < 10) "$i.   " else "$i. ", style = textStyle)
+                    Text(text = if (i < 10) "$i.   " else "$i. ", style = textStyle)
                     Text(text = item, style = textStyle)
                 }
                 i += 1

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 interface IBlock {
     val name: String
     val hours: String
-    val ects: String
+    val ects: Int
     val exam: String
     val block_type: String
     val subjects: MutableList<Subject>
@@ -15,7 +15,7 @@ interface IBlock {
 data class Block(
     override val name: String,
     override val hours: String,
-    override val ects: String,
+    override val ects: Int,
     override val exam: String,
     override val block_type: String,
     override val subjects: MutableList<Subject>,

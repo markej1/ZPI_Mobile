@@ -9,7 +9,9 @@ data class CourseDetails(
     val cnps: Double,
     val hasExam: Boolean,
     val inGroupCourse: Boolean,
-    val hasCurriculum: Boolean
+    val hasCurriculum: Boolean,
+    val curriculumContent: List<String>? = null,
+    val crediting: String
 )
 @Serializable
 sealed class ICourse {

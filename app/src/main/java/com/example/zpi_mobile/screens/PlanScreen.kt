@@ -3,6 +3,7 @@
 package com.example.zpi_mobile.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
@@ -24,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.zpi_mobile.R
 import com.example.zpi_mobile.SharedPreferencesManager
@@ -35,6 +38,7 @@ import com.example.zpi_mobile.ui.theme.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -59,13 +63,19 @@ fun PlanScreen(
     val semester = semesters[pagerState.currentPage]
     val scope = rememberCoroutineScope()
 
-    var allSubjects by remember { mutableStateOf(listOf<Subject>()) }
+    var allSubjects by remember { mutableStateOf(subjectService.allSubjects) }
     var allBlocks by remember { mutableStateOf(listOf<Block>()) }
 
+    var blurPower by remember { mutableStateOf(0)}
+
+
     LaunchedEffect(Unit) {
-        subjectService.getAllSubjects(1, "s", "s", 1)
-        allSubjects = subjectService.allSubjects
-        allBlocks = subjectService.allBlocks
+        if(allSubjects.isEmpty()) {
+            Log.d("dziala", "get all subjects...")
+            subjectService.getAllSubjects(1, "s", "s", 1)
+            allSubjects = subjectService.allSubjects
+            allBlocks = subjectService.allBlocks
+        }
     }
 
     Scaffold(
@@ -148,9 +158,18 @@ fun PlanScreen(
                     }
                 }
             }
-            Box {
+            Box(
+                modifier = Modifier.blur(blurPower.dp)
+            ) {
                 if (subjectService.isDialogShown) {
-                    SubjectSelect(subjectService, navController)
+                    SubjectSelect(subjectService, navController, scope)
+                }
+                if (subjectService.loading) {
+                    blurPower = 10
+                    CircularProgressIndicator(
+                        color = StatusBarColor,
+                        modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center).zIndex(1000.0f)
+                    )
                 }
                 HorizontalPager(
                     count = semesters.size,
@@ -162,7 +181,7 @@ fun PlanScreen(
                 ) { semester ->
                     when (semester) {
                         0 -> PlanViewAll(subjectService, navController)
-                        else -> PlanViewSemester(subjectService, navController, semester)
+                        else -> PlanViewSemester(subjectService, navController, semester, scope)
 
                     }
                 }
@@ -179,6 +198,7 @@ fun SubjectTile(
     block: Block,
     subjectService: SubjectService,
     navController: NavController,
+    scope: CoroutineScope
 ) {
     val textStyleBody = MaterialTheme.typography.bodySmall
     var textStyle by remember { mutableStateOf(textStyleBody) }
@@ -192,7 +212,13 @@ fun SubjectTile(
                 val subject = subjectService.getSubjectByName(block.subjects[id].name, block)
                 if (subject != null) {
                     subjectService.chooseSubject(subject)
-                    navController.navigate("subject_card_screen")
+                    scope.launch {
+                        if(subject.lecture == null && subject.classes == null && subject.laboratory == null && subject.seminar == null && subject.project == null) {
+                            subjectService.getSubjectDetails()
+                        }
+//                        subjectService.getSubjectDetails()
+                        navController.navigate("subject_card_screen")
+                    }
                 }
             }
                   },
@@ -219,7 +245,7 @@ fun SubjectTile(
                     .wrapContentWidth()
             ){
                 Text(
-                    text = block.ects + " ECTS",
+                    text = block.ects.toString() + " ECTS",
                     textAlign = TextAlign.Start,
                     style = textStyle,
                     modifier = Modifier
@@ -273,6 +299,7 @@ fun PlanViewSemester(
     subjectService: SubjectService,
     navController: NavController,
     semester: Int,
+    scope: CoroutineScope
 ) {
     val blocks = subjectService.getSubjectsBySemester(semester)
 
@@ -282,7 +309,7 @@ fun PlanViewSemester(
         ) {
             items(blocks.size) { index ->
 
-               SubjectTile(false, 0, blocks[index], subjectService, navController)
+               SubjectTile(false, 0, blocks[index], subjectService, navController, scope)
 
             }
         }
@@ -348,7 +375,8 @@ fun PlanViewAll(
 @Composable
 fun SubjectSelect(
     subjectService: SubjectService,
-    navController: NavController
+    navController: NavController,
+    scope: CoroutineScope
 ) {
     val clickedBlock = subjectService.clickedBlock
     val subjects = clickedBlock?.subjects
@@ -361,7 +389,7 @@ fun SubjectSelect(
             LazyColumn(modifier = Modifier.padding(8.dp)) {
                 subjects?.size?.let {
                     items(it) { index ->
-                        SubjectTile(true, index, clickedBlock, subjectService, navController)
+                        SubjectTile(true, index, clickedBlock, subjectService, navController, scope)
                     }
                 }
             }
@@ -373,14 +401,27 @@ fun SubjectSelect(
 @Composable
 fun cardColor(type: String, isBlock: Boolean): Color {
     return when (Pair(type, isBlock)) {
-        Pair("Field of study", false) -> przedmiotKierunkowy
+        Pair("Field Of Study", false) -> przedmiotKierunkowy
         Pair("przedmiot specjalnościowy", false) -> przedmiotSpecjalnosciowy
+        Pair("Physics", false) -> przedmiotNaukPodstawowych
+        Pair("Mathematics", false) -> przedmiotNaukPodstawowych
         Pair("Basic science", false) -> przedmiotNaukPodstawowych
         Pair("General education", false) -> przedmiotKsztalceniaOgolnego
-        Pair("Field of study", true) -> blokKierunkowy
+        Pair("Information technologies", false) -> przedmiotKsztalceniaOgolnego
+        Pair("Foreign languages", false) -> przedmiotKsztalceniaOgolnego
+        Pair("Liberal-managerial" , false) -> przedmiotKsztalceniaOgolnego
+        Pair("Sporting classes" , false) -> przedmiotKsztalceniaOgolnego
+
+        Pair("Field Of Study", true) -> blokKierunkowy
         Pair("przedmiot specjalnościowy", true) -> blokSpecjalnosciowy
-        Pair("Basic science", true) -> blokKsztalceniaOgolnego
-        Pair("General education", true) -> blokNaukPodstawowych
+        Pair("Physics", true) -> blokNaukPodstawowych
+        Pair("Mathematics", true) -> blokNaukPodstawowych
+        Pair("Basic science", true) -> blokNaukPodstawowych
+        Pair("General education", true) -> blokKsztalceniaOgolnego
+        Pair("Information technologies", true) -> blokKsztalceniaOgolnego
+        Pair("Foreign languages", true) -> blokKsztalceniaOgolnego
+        Pair("Liberal-managerial" , true) -> blokKsztalceniaOgolnego
+        Pair("Sporting classes" , true) -> blokKsztalceniaOgolnego
         else -> Color.LightGray
     }
 }

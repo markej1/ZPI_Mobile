@@ -17,428 +17,19 @@ class SubjectService: ViewModel() {
 
     private val httpClient = KtorHttpClient()
 
-//    fun getBlocks(): List<Block> {
-//        val blocks: List<Block> = listOf(
-//            Block(
-//                name = "Organizacja Systemów Komputerowych",
-//                hours = "21000",
-//                ects = "5",
-//                exam = "",
-//                block_type = "przedmiot kierunkowy",
-//                subjects = listOf(
-//                    Subject(
-//                        id = 1,
-//                        name = "Organizacja Systemów Komputerowych",
-//                        lecture = Lecture(
-//                            ECTS = "3",
-//                            ZZU = "30",
-//                            CNPS = "90",
-//                            crediting = ""
-//                        ),
-//                        classes = Classes(
-//                            ECTS = "2",
-//                            ZZU = "15",
-//                            CNPS = "45",
-//                            crediting = ""
-//                        ),
-//                        group_of_courses = "NIE",
-//                        programme_content = listOf(
-//                            "Złożoności (1/4), iteratory.",
-//                            "Złożoności (2/4), listy wiązane.",
-//                            "Złożoności (3/4), stosy i kolejki zwykłe.",
-//                            "Złożoności (4/4), techniki rozwiązywania problemów",
-//                            "Komparatory, sortowania proste.",
-//                            "Sortowania efektywne. Kopiec. ",
-//                            "Wyszukiwania liniowe i binarne, kolejki priorytetowe, tablice mieszające",
-//                            "Drzewa przedziałowe, kopce dwumianowe, las zbiorów rozłącznych.",
-//                            "Przekazywanie akcji i danych – intencje, współdziałanie aktywności, użycie aktywności systemowych. Obsługa zmiany konfiguracji. "
-//                        ),
-//                        kind_of_subject = "Obowiązkowy",
-//                        link = "",
-//                        project = Project(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        seminar = Seminar(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        laboratory = Laboratory(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        )
-//                    ),
-//                    Subject(
-//                        id = 1,
-//                        name = "Sieci komputerowe",
-//                        lecture = Lecture(
-//                            ECTS = "3",
-//                            ZZU = "30",
-//                            CNPS = "90",
-//                            crediting = ""
-//                        ),
-//                        classes = Classes(
-//                            ECTS = "2",
-//                            ZZU = "15",
-//                            CNPS = "45",
-//                            crediting = ""
-//                        ),
-//                        group_of_courses = "NIE",
-//                        programme_content = listOf(),
-//                        kind_of_subject = "Obowiązkowy",
-//                        link = "",
-//                        project = Project(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        seminar = Seminar(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        laboratory = Laboratory(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        )
-//                    )
-//                )
-//            ),
-//            Block(
-//                name = "Analiza matematyczna I",
-//                hours = "21000",
-//                ects = "5",
-//                exam = "E",
-//                block_type = "przedmiot kształcenia ogólnego",
-//                subjects = listOf(
-//                    Subject(
-//                        id = 1,
-//                        name = "Organizacja Systemów Komputerowych",
-//                        lecture = Lecture(
-//                            ECTS = "3",
-//                            ZZU = "30",
-//                            CNPS = "90",
-//                            crediting = ""
-//                        ),
-//                        classes = Classes(
-//                            ECTS = "2",
-//                            ZZU = "15",
-//                            CNPS = "45",
-//                            crediting = ""
-//                        ),
-//                        group_of_courses = "NIE",
-//                        programme_content = listOf(),
-//                        kind_of_subject = "Obowiązkowy",
-//                        link = "",
-//                        project = Project(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        seminar = Seminar(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        laboratory = Laboratory(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        )
-//                    ),
-//                    Subject(
-//                        id = 1,
-//                        name = "Sieci komputerowe",
-//                        lecture = Lecture(
-//                            ECTS = "3",
-//                            ZZU = "30",
-//                            CNPS = "90",
-//                            crediting = ""
-//                        ),
-//                        classes = Classes(
-//                            ECTS = "2",
-//                            ZZU = "15",
-//                            CNPS = "45",
-//                            crediting = ""
-//                        ),
-//                        group_of_courses = "NIE",
-//                        programme_content = listOf(),
-//                        kind_of_subject = "Obowiązkowy",
-//                        link = "",
-//                        project = Project(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        seminar = Seminar(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        laboratory = Laboratory(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        )
-//                    ),
-//                    Subject(
-//                        id = 1,
-//                        name = "Bazy danych",
-//                        lecture = Lecture(
-//                            ECTS = "3",
-//                            ZZU = "30",
-//                            CNPS = "90",
-//                            crediting = ""
-//                        ),
-//                        classes = Classes(
-//                            ECTS = "2",
-//                            ZZU = "15",
-//                            CNPS = "45",
-//                            crediting = ""
-//                        ),
-//                        group_of_courses = "NIE",
-//                        programme_content = listOf(),
-//                        kind_of_subject = "Obowiązkowy",
-//                        link = "",
-//                        project = Project(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        seminar = Seminar(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        laboratory = Laboratory(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        )
-//                    )
-//                )
-//            ),
-//            Block(
-//                name = "M",
-//                hours = "21000",
-//                ects = "5",
-//                exam = "",
-//                block_type = "przedmiot specjalnościowy",
-//                subjects = listOf(
-//                    Subject(
-//                        id = 1,
-//                        name = "M",
-//                        lecture = Lecture(
-//                            ECTS = "3",
-//                            ZZU = "30",
-//                            CNPS = "90",
-//                            crediting = ""
-//                        ),
-//                        classes = Classes(
-//                            ECTS = "2",
-//                            ZZU = "15",
-//                            CNPS = "45",
-//                            crediting = ""
-//                        ),
-//                        group_of_courses = "NIE",
-//                        programme_content = listOf(),
-//                        kind_of_subject = "TESTTESTTEST",
-//                        link = "",
-//                        project = Project(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        seminar = Seminar(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        laboratory = Laboratory(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        )
-//                    )
-//                )
-//            ),
-//            Block(
-//                name = "Wpowadzenie do zarządzania projektami informatycznymi",
-//                hours = "21000",
-//                ects = "5",
-//                exam = "",
-//                block_type = "przedmiot nauk podstawowych",
-//                subjects = listOf(
-//                    Subject(
-//                        id = 1,
-//                        name = "Wpowadzenie do zarządzania projektami informatycznymi",
-//                        lecture = Lecture(
-//                            ECTS = "3",
-//                            ZZU = "30",
-//                            CNPS = "90",
-//                            crediting = ""
-//                        ),
-//                        classes = Classes(
-//                            ECTS = "2",
-//                            ZZU = "15",
-//                            CNPS = "45",
-//                            crediting = ""
-//                        ),
-//                        group_of_courses = "NIE",
-//                        programme_content = listOf(),
-//                        kind_of_subject = "Obowiązkowy",
-//                        link = "",
-//                        project = Project(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        seminar = Seminar(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        laboratory = Laboratory(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        )
-//                    )
-//                )
-//            ),
-//            Block(
-//                name = "Blok",
-//                hours = "21000",
-//                ects = "5",
-//                exam = "",
-//                block_type = "blok kierunkowy",
-//                subjects = listOf(
-//                    Subject(
-//                        id = 1,
-//                        name = "Organizacja Systemów Komputerowych",
-//                        lecture = Lecture(
-//                            ECTS = "3",
-//                            ZZU = "30",
-//                            CNPS = "90",
-//                            crediting = ""
-//                        ),
-//                        classes = Classes(
-//                            ECTS = "2",
-//                            ZZU = "15",
-//                            CNPS = "45",
-//                            crediting = ""
-//                        ),
-//                        group_of_courses = "NIE",
-//                        programme_content = listOf(),
-//                        kind_of_subject = "Obowiązkowy",
-//                        link = "",
-//                        project = Project(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        seminar = Seminar(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        laboratory = Laboratory(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        )
-//                    )
-//                )
-//            ),
-//            Block(
-//                name = "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
-//                hours = "21000",
-//                ects = "5",
-//                exam = "",
-//                block_type = "blok kształcenia ogólnego",
-//                subjects = listOf(
-//                    Subject(
-//                        id = 1,
-//                        name = "Organizacja Systemów Komputerowych",
-//                        lecture = Lecture(
-//                            ECTS = "3",
-//                            ZZU = "30",
-//                            CNPS = "90",
-//                            crediting = ""
-//                        ),
-//                        classes = Classes(
-//                            ECTS = "2",
-//                            ZZU = "15",
-//                            CNPS = "45",
-//                            crediting = ""
-//                        ),
-//                        group_of_courses = "NIE",
-//                        programme_content = listOf(),
-//                        kind_of_subject = "Obowiązkowy",
-//                        link = "",
-//                        project = Project(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        seminar = Seminar(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        ),
-//                        laboratory = Laboratory(
-//                            ECTS = "",
-//                            ZZU = "",
-//                            CNPS = "",
-//                            crediting = ""
-//                        )
-//                    )
-//                )
-//            )
-//        )
-//        return blocks
-//    }
-
     private val _url = "https://susel.pythonanywhere.com/"
     var allSubjects by mutableStateOf<List<Subject>>(listOf())
     var allBlocks by mutableStateOf<List<Block>>(listOf())
     var program by mutableStateOf<Program?>(null)
+    var loading by mutableStateOf(false)
 
     fun getBlocks(): List<Block> {return listOf()}
     suspend fun getAllSubjects(level: Int, field: String, cycle: String, specialization: Int) {
         val blocks: MutableList<Block> = mutableListOf()
         val subjects: MutableList<Subject> = mutableListOf()
         val semesters: MutableList<List<Subject>> = mutableListOf()
+
+        loading = true
 
         val program: List<Program> = httpClient
             .getHttpClient()
@@ -457,33 +48,11 @@ class SubjectService: ViewModel() {
         var semesterId = 1
         for (semester in semesters) {
             for (subject in semester) {
-                val courses: List<ICourse> = httpClient
-                    .getHttpClient()
-                    .get(_url + "desc/1/Informatyka_Stosowana/2023/${subject.moduleId}/${subject.subjectId}/" ).body()
-                for (course in courses) {
-                    when (course) {
-                        is Lecture -> {
-                            subject.lecture = course.details
-                        }
-                        is Classes -> {
-                            subject.classes = course.details
-                        }
-                        is Laboratory -> {
-                            subject.laboratory = course.details
-                        }
-                        is Seminar -> {
-                            subject.seminar = course.details
-                        }
-                        is Project -> {
-                            subject.project = course.details
-                        }
-                    }
-                }
                 subjects.add(subject)
                 val tempBlock = blocks.find { it.name == subject.module }
                 // jezeli w liscie blokow znajduje sie juz blok o danej nazwie to nalezy dodac ten przedmiot do listy przedmiotow w bloku
                 if(tempBlock == null) {
-                    blocks.add(Block(name = subject.module ?: subject.name, block_type = subject.category, ects = "5", exam = "E", hours = "21000", subjects = mutableListOf(subject), semester = semesterId))
+                    blocks.add(Block(name = subject.module ?: subject.name, block_type = subject.category, ects = subject.ects, exam = if(subject.hasExam) "E" else "", hours = subject.hours, subjects = mutableListOf(subject), semester = semesterId))
                 } else {
                     tempBlock.subjects.add(subject)
                 }
@@ -491,15 +60,46 @@ class SubjectService: ViewModel() {
             semesterId += 1
         }
         allSubjects = subjects
-        allBlocks = blocks
+        allBlocks = blocks.sortedBy { block -> block.name }
+        loading = false
     }
+
+    suspend fun getSubjectDetails() {
+        loading = true
+
+        val courses: List<ICourse> = httpClient
+            .getHttpClient()
+            .get(_url + "desc/1/Informatyka_Stosowana/2023/${chosenSubject?.moduleId}/${chosenSubject?.subjectId}")
+            .body()
+
+        for (course in courses) {
+            when (course) {
+                is Lecture -> {
+                    chosenSubject?.lecture = course.details
+                }
+                is Classes -> {
+                    chosenSubject?.classes = course.details
+                }
+                is Laboratory -> {
+                    chosenSubject?.laboratory = course.details
+                }
+                is Seminar -> {
+                    chosenSubject?.seminar = course.details
+                }
+                is Project -> {
+                    chosenSubject?.project = course.details
+                }
+            }
+        }
+        loading = false
+    }
+
     fun getSubjectsBySemester(semester: Int): List<Block> {
         val resultBlock = mutableListOf<Block>()
         for (block in allBlocks) {
             if (block.semester == semester) resultBlock.add(block)
         }
-        Log.d("galo", resultBlock.toString())
-        return resultBlock
+        return resultBlock.sortedBy { block -> block.name }
     }
 
     var isDialogShown by mutableStateOf(false)
