@@ -33,7 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.zpi_mobile.model.Course
+import com.example.zpi_mobile.model.CourseDetails
 import com.example.zpi_mobile.http.receive.SubjectService
 
 @Composable
@@ -59,13 +59,13 @@ fun SubjectCardScreen(
         )
         LazyColumn {
             items(1) {
-                SubjectInfo(subjectService, textStyle)
-                ListItem("Wykład", subjectService.chosenSubject!!.lecture, textStyle)
-                ListItem("Ćwiczenia", subjectService.chosenSubject!!.classes, textStyle)
-                ListItem("Laboratorium", subjectService.chosenSubject!!.laboratory, textStyle)
-                ListItem("Seminarium", subjectService.chosenSubject!!.seminar, textStyle)
-                ListItem("Projekt", subjectService.chosenSubject!!.project, textStyle)
-                ProgrammeContent(programmeContent = subjectService.chosenSubject!!.programme_content, textStyle)
+//                SubjectInfo(subjectService, textStyle)
+                ListItem("Wykład", subjectService.chosenSubject?.lecture, textStyle)
+                ListItem("Ćwiczenia", subjectService.chosenSubject?.classes, textStyle)
+                ListItem("Laboratorium", subjectService.chosenSubject?.laboratory, textStyle)
+                ListItem("Seminarium", subjectService.chosenSubject?.seminar, textStyle)
+                ListItem("Projekt", subjectService.chosenSubject?.project, textStyle)
+                ProgrammeContent(programmeContent = subjectService.chosenSubject?.curriculumContent, textStyle)
                 Link("https://wit.pwr.edu.pl/studenci/programy-studiow/2023-2024-studia-i-stopnia", textStyle)
             }
         }
@@ -80,12 +80,12 @@ fun SubjectInfo(
     ElevatedCard(modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
         Row(modifier = Modifier.padding(all = 10.dp)) {
             Text(text = "Rodzaj przedmiotu:", style = textStyle)
-            Text(text = subjectService.chosenSubject!!.kind_of_subject,
-                style = textStyle,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.End)
-            )
+//            Text(text = subjectService.chosenSubject!!.kind_of_subject,
+//                style = textStyle,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentWidth(Alignment.End)
+//            )
         }
     }
 }
@@ -93,7 +93,7 @@ fun SubjectInfo(
 @Composable
 fun ListItem(
     courseType: String,
-    course: Course,
+    course: CourseDetails?,
     textStyle: TextStyle
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -119,33 +119,42 @@ fun ListItem(
             if (expanded) {
                 Row {
                     Text(text = "Liczba godzin CNPS:", style = textStyle)
-                    Text(text = course.CNPS, style = textStyle, modifier = Modifier
+                    Text(text = course?.cnps?.toString() ?: "", style = textStyle, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Liczba godzin ZZU:", style = textStyle)
-                    Text(text = course.ZZU, style = textStyle, modifier = Modifier
+                    Text(text = course?.zzu?.toString() ?: "", style = textStyle, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Forma zaliczenia:", style = textStyle)
-                    Text(text = course.crediting, style = textStyle, modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth(Alignment.End))
+                    if(course != null) {
+                        Text(
+                            text = course?.crediting.toString(),
+                            style = textStyle,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentWidth(Alignment.End)
+                        )
+                    }
                 }
                 Row {
                     Text(text = "Punkty ECTS:", style = textStyle)
-                    Text(text = course.ECTS, style = textStyle, modifier = Modifier
+                    Text(text = course?.ects?.toString() ?: "", style = textStyle, modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End))
                 }
                 Row {
                     Text(text = "Grupa kursów:", style = textStyle)
-                    Text(text = course.crediting, style = textStyle, modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth(Alignment.End))
+                    if(course != null) {
+                        Text(text = if (course.inGroupCourse) "Tak" else "Nie", style = textStyle, modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.End)
+                        )
+                    }
                 }
             }
         }
@@ -154,7 +163,7 @@ fun ListItem(
 
 @Composable
 fun ProgrammeContent(
-    programmeContent: List<String>,
+    programmeContent: List<String>?,
     textStyle: TextStyle
 ) {
     var i = 1
@@ -163,7 +172,7 @@ fun ProgrammeContent(
         .padding(horizontal = 10.dp, vertical = 5.dp)) {
         Column(modifier = Modifier.padding(all = 10.dp)) {
             Text(text = "Treści programowe:", style = textStyle, modifier = Modifier.padding(bottom = 5.dp))
-            programmeContent.forEach { item ->
+            programmeContent?.forEach { item ->
                 Row {
                     Text(text = if (i < 10) "$i.   " else "$i. ", style = textStyle)
                     Text(text = item, style = textStyle)

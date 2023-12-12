@@ -12,7 +12,7 @@ fun Navigation(
     subjectService: SubjectService
 ) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screen.StartScreen.route) {
+    NavHost(navController = navController, startDestination = Screen.PlanScreen.route) {
 
         composable(route = Screen.StartScreen.route) {
             StartScreen(navController = navController)

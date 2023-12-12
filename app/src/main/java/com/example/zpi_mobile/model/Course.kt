@@ -1,50 +1,51 @@
 package com.example.zpi_mobile.model
 
-import kotlinx.serialization.Serializable
 
-interface Course {
-    val ECTS: String
-    val ZZU: String
-    val CNPS: String
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+@Serializable
+data class CourseDetails(
+    val ects: Double,
+    val zzu: Double,
+    val cnps: Double,
+    val hasExam: Boolean,
+    val inGroupCourse: Boolean,
+    val hasCurriculum: Boolean,
+    val curriculumContent: List<String>? = null,
     val crediting: String
+)
+@Serializable
+sealed class ICourse {
+    abstract val type: String
+    @SerialName("detalis") abstract val details: CourseDetails
 }
 
 @Serializable
+@SerialName("Lecture")
 data class Lecture(
-    override val ECTS: String,
-    override val ZZU: String,
-    override  val CNPS: String,
-    override val crediting: String
-): Course
+    @SerialName("detalis")  override val details: CourseDetails, override val type: String
+): ICourse()
 
 @Serializable
+@SerialName("Seminar")
 data class Seminar(
-    override val ECTS: String,
-    override val ZZU: String,
-    override  val CNPS: String,
-    override val crediting: String
-): Course
+    @SerialName("detalis")  override val details: CourseDetails, override val type: String
+): ICourse()
 
 @Serializable
+@SerialName("Laboratory")
 data class Laboratory(
-    override val ECTS: String,
-    override val ZZU: String,
-    override  val CNPS: String,
-    override val crediting: String
-): Course
+    @SerialName("detalis")  override val details: CourseDetails, override val type: String
+): ICourse()
 
 @Serializable
+@SerialName("Classes")
 data class Classes(
-    override val ECTS: String,
-    override val ZZU: String,
-    override  val CNPS: String,
-    override val crediting: String
-): Course
+    @SerialName("detalis")  override val details: CourseDetails, override val type: String
+): ICourse()
 
 @Serializable
+@SerialName("Project")
 data class Project(
-    override val ECTS: String,
-    override val ZZU: String,
-    override  val CNPS: String,
-    override val crediting: String
-): Course
+    @SerialName("detalis")  override val details: CourseDetails, override val type: String
+): ICourse()

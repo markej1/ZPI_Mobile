@@ -3,6 +3,7 @@
 package com.example.zpi_mobile.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,23 +11,22 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.zpi_mobile.R
 import com.example.zpi_mobile.SharedPreferencesManager
@@ -37,6 +37,7 @@ import com.example.zpi_mobile.ui.theme.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -60,6 +61,21 @@ fun PlanScreen(
     val pagerState = rememberPagerState()
     val semester = semesters[pagerState.currentPage]
     val scope = rememberCoroutineScope()
+
+    var allSubjects by remember { mutableStateOf(subjectService.allSubjects) }
+    var allBlocks by remember { mutableStateOf(listOf<Block>()) }
+
+    var blurPower by remember { mutableStateOf(0)}
+
+
+    LaunchedEffect(Unit) {
+        if(allSubjects.isEmpty()) {
+            Log.d("dziala", "get all subjects...")
+            subjectService.getAllSubjects(1, "s", "s", 1)
+            allSubjects = subjectService.allSubjects
+            allBlocks = subjectService.allBlocks
+        }
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -141,9 +157,18 @@ fun PlanScreen(
                     }
                 }
             }
-            Box {
+            Box(
+                modifier = Modifier.blur(blurPower.dp)
+            ) {
                 if (subjectService.isDialogShown) {
-                    SubjectSelect(subjectService, navController)
+                    SubjectSelect(subjectService, navController, scope)
+                }
+                if (subjectService.loading) {
+                    blurPower = 10
+                    CircularProgressIndicator(
+                        color = StatusBarColor,
+                        modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center).zIndex(1000.0f)
+                    )
                 }
                 HorizontalPager(
                     count = semesters.size,
@@ -152,10 +177,11 @@ fun PlanScreen(
                     modifier = Modifier
                         .wrapContentHeight()
                         .fillMaxSize()
-                ) { index ->
-                    when (index) {
+                ) { semester ->
+                    when (semester) {
                         0 -> PlanViewAll(subjectService, navController)
-                        else -> PlanViewSemester(subjectService, navController)
+                        else -> PlanViewSemester(subjectService, navController, semester, scope)
+
                     }
                 }
             }
@@ -170,9 +196,10 @@ fun SubjectTile(
     id: Int,
     block: Block,
     subjectService: SubjectService,
-    navController: NavController
+    navController: NavController,
+    scope: CoroutineScope
 ) {
-    var textStyleBody = MaterialTheme.typography.bodySmall
+    val textStyleBody = MaterialTheme.typography.bodySmall
     var textStyle by remember { mutableStateOf(textStyleBody) }
     var readyToDraw by remember { mutableStateOf(false) }
     Card(
@@ -184,12 +211,18 @@ fun SubjectTile(
                 val subject = subjectService.getSubjectByName(block.subjects[id].name, block)
                 if (subject != null) {
                     subjectService.chooseSubject(subject)
-                    navController.navigate("subject_card_screen")
+                    scope.launch {
+                        if(subject.lecture == null && subject.classes == null && subject.laboratory == null && subject.seminar == null && subject.project == null) {
+                            subjectService.getSubjectDetails()
+                        }
+//                        subjectService.getSubjectDetails()
+                        navController.navigate("subject_card_screen")
+                    }
                 }
             }
                   },
         colors = CardDefaults.cardColors(
-                        containerColor = cardColor(type = block.block_type)
+                        containerColor = cardColor(type = block.block_type, isBlock = block.subjects.size > 1 && !isInSelectDialog)
                  ),
         modifier = Modifier
             .fillMaxWidth()
@@ -211,7 +244,7 @@ fun SubjectTile(
                     .wrapContentWidth()
             ){
                 Text(
-                    text = block.ects + " ECTS",
+                    text = block.ects.toString() + " ECTS",
                     textAlign = TextAlign.Start,
                     style = textStyle,
                     modifier = Modifier
@@ -259,82 +292,23 @@ fun SubjectTile(
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun PlanViewSemester(
     subjectService: SubjectService,
-    navController: NavController
+    navController: NavController,
+    semester: Int,
+    scope: CoroutineScope
 ) {
-    val subjects: List<Block> = subjectService.getBlocks()
-    val textStyle: TextStyle = MaterialTheme.typography.bodySmall
+    val blocks = subjectService.getSubjectsBySemester(semester)
+
     Box(contentAlignment = Alignment.TopCenter) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 164.dp),
         ) {
-            items(subjects.size) { index ->
+            items(blocks.size) { index ->
 
-               SubjectTile(false, 0, subjects[index], subjectService, navController)
-
-//                 Card(
-//                     onClick = {},
-//                     colors = CardDefaults.cardColors(
-//                         containerColor = cardColor(type = subjects[index].block_type)
-//                     ),
-//                     modifier = Modifier
-//                         .fillMaxWidth()
-//                         .padding(8.dp),
-//                     elevation = CardDefaults.cardElevation(4.dp),
-//                     shape = MaterialTheme.shapes.medium
-//                 ) {
-//                     Column(
-//                         modifier = Modifier
-//                             .fillMaxSize()
-//                             .heightIn(min = 160.dp),
-//                         verticalArrangement = Arrangement.SpaceBetween
-//                     ) {
-//                         Row(
-//                             modifier = Modifier
-//                                 .padding(horizontal = 8.dp)
-//                                 .padding(top = 8.dp)
-//                                 .fillMaxWidth()
-//                                 .wrapContentWidth()
-//                         ) {
-//                             Text(
-//                                 text = subjects[index].ects + " ECTS",
-//                                 style = textStyle,
-//                                 textAlign = TextAlign.Start,
-//                                 modifier = Modifier
-
-//                             )
-//                             Text(
-//                                 text = subjects[index].exam,
-//                                 style = textStyle,
-//                                 textAlign = TextAlign.End,
-//                                 modifier = Modifier
-//                                     .fillMaxWidth()
-//                                     .wrapContentWidth(align = Alignment.End)
-//                             )
-//                         }
-//                         Text(
-//                             text = subjects[index].name,
-//                             style = textStyle,
-//                             maxLines = 4,
-//                             textAlign = TextAlign.Center,
-//                             modifier = Modifier
-//                                 .padding(horizontal = 8.dp)
-//                                 .fillMaxWidth()
-//                                 .wrapContentWidth(Alignment.CenterHorizontally)
-//                         )
-//                         Text(
-//                             text = subjects[index].hours,
-//                             style = textStyle,
-//                             textAlign = TextAlign.Center,
-//                             modifier = Modifier
-//                                 .fillMaxSize()
-//                                 .wrapContentSize(Alignment.BottomCenter)
-//                                 .padding(bottom = 8.dp)
-//                         )
-//                     }
-//                 }
+               SubjectTile(false, 0, blocks[index], subjectService, navController, scope)
 
             }
         }
@@ -347,7 +321,7 @@ fun PlanViewAll(
     subjectService: SubjectService,
     navController: NavController
 ) {
-    val blocks: List<Block> = subjectService.getBlocks()
+    val blocks: List<Block> = subjectService.allBlocks
     Box(contentAlignment = Alignment.TopCenter) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 128.dp),
@@ -367,7 +341,7 @@ fun PlanViewAll(
                         }
                               },
                     colors = CardDefaults.cardColors(
-                        containerColor = cardColor(type = blocks[index].block_type)
+                        containerColor = cardColor(type = blocks[index].block_type, isBlock = blocks[index].subjects.size > 1)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -400,7 +374,8 @@ fun PlanViewAll(
 @Composable
 fun SubjectSelect(
     subjectService: SubjectService,
-    navController: NavController
+    navController: NavController,
+    scope: CoroutineScope
 ) {
     val clickedBlock = subjectService.clickedBlock
     val subjects = clickedBlock?.subjects
@@ -413,7 +388,7 @@ fun SubjectSelect(
             LazyColumn(modifier = Modifier.padding(8.dp)) {
                 subjects?.size?.let {
                     items(it) { index ->
-                        SubjectTile(true, index, clickedBlock, subjectService, navController)
+                        SubjectTile(true, index, clickedBlock, subjectService, navController, scope)
                     }
                 }
             }
@@ -423,17 +398,30 @@ fun SubjectSelect(
 
 
 @Composable
-fun cardColor(type: String): Color {
-    return when (type) {
-        "przedmiot kierunkowy" -> przedmiotKierunkowy
-        "przedmiot specjalnościowy" -> przedmiotSpecjalnosciowy
-        "przedmiot nauk podstawowych" -> przedmiotNaukPodstawowych
-        "przedmiot kształcenia ogólnego" -> przedmiotKsztalceniaOgolnego
-        "blok kierunkowy" -> blokKierunkowy
-        "blok specjalnościowy" -> blokSpecjalnosciowy
-        "blok kształcenia ogólnego" -> blokKsztalceniaOgolnego
-        "blok nauk podstawowych" -> blokNaukPodstawowych
-        else -> Color.Black
+fun cardColor(type: String, isBlock: Boolean): Color {
+    return when (Pair(type, isBlock)) {
+        Pair("Field Of Study", false) -> przedmiotKierunkowy
+        Pair("przedmiot specjalnościowy", false) -> przedmiotSpecjalnosciowy
+        Pair("Physics", false) -> przedmiotNaukPodstawowych
+        Pair("Mathematics", false) -> przedmiotNaukPodstawowych
+        Pair("Basic science", false) -> przedmiotNaukPodstawowych
+        Pair("General education", false) -> przedmiotKsztalceniaOgolnego
+        Pair("Information technologies", false) -> przedmiotKsztalceniaOgolnego
+        Pair("Foreign languages", false) -> przedmiotKsztalceniaOgolnego
+        Pair("Liberal-managerial" , false) -> przedmiotKsztalceniaOgolnego
+        Pair("Sporting classes" , false) -> przedmiotKsztalceniaOgolnego
+
+        Pair("Field Of Study", true) -> blokKierunkowy
+        Pair("przedmiot specjalnościowy", true) -> blokSpecjalnosciowy
+        Pair("Physics", true) -> blokNaukPodstawowych
+        Pair("Mathematics", true) -> blokNaukPodstawowych
+        Pair("Basic science", true) -> blokNaukPodstawowych
+        Pair("General education", true) -> blokKsztalceniaOgolnego
+        Pair("Information technologies", true) -> blokKsztalceniaOgolnego
+        Pair("Foreign languages", true) -> blokKsztalceniaOgolnego
+        Pair("Liberal-managerial" , true) -> blokKsztalceniaOgolnego
+        Pair("Sporting classes" , true) -> blokKsztalceniaOgolnego
+        else -> Color.LightGray
     }
 }
 
