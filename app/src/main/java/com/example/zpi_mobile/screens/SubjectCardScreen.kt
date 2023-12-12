@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.zpi_mobile.model.CourseDetails
 import com.example.zpi_mobile.http.receive.SubjectService
+import com.example.zpi_mobile.model.Subject
 
 @Composable
 fun SubjectCardScreen(
@@ -59,33 +60,14 @@ fun SubjectCardScreen(
         )
         LazyColumn {
             items(1) {
-//                SubjectInfo(subjectService, textStyle)
                 ListItem("Wykład", subjectService.chosenSubject?.lecture, textStyle)
                 ListItem("Ćwiczenia", subjectService.chosenSubject?.classes, textStyle)
                 ListItem("Laboratorium", subjectService.chosenSubject?.laboratory, textStyle)
                 ListItem("Seminarium", subjectService.chosenSubject?.seminar, textStyle)
                 ListItem("Projekt", subjectService.chosenSubject?.project, textStyle)
                 ProgrammeContent(programmeContent = subjectService.chosenSubject?.curriculumContent, textStyle)
-                Link("https://wit.pwr.edu.pl/studenci/programy-studiow/2023-2024-studia-i-stopnia", textStyle)
+                Link(getLink(subjectService.chosenSubject), textStyle)
             }
-        }
-    }
-}
-
-@Composable
-fun SubjectInfo(
-    subjectService: SubjectService,
-    textStyle: TextStyle
-) {
-    ElevatedCard(modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
-        Row(modifier = Modifier.padding(all = 10.dp)) {
-            Text(text = "Rodzaj przedmiotu:", style = textStyle)
-//            Text(text = subjectService.chosenSubject!!.kind_of_subject,
-//                style = textStyle,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentWidth(Alignment.End)
-//            )
         }
     }
 }
@@ -133,7 +115,7 @@ fun ListItem(
                     Text(text = "Forma zaliczenia:", style = textStyle)
                     if(course != null) {
                         Text(
-                            text = course?.crediting.toString(),
+                            text = course.crediting,
                             style = textStyle,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -201,5 +183,15 @@ fun Link(
             Text(text = "Link do oryginału:", style = textStyle, modifier = Modifier.padding(bottom = 5.dp))
             Text(text = url, style = textStyle)
         }
+    }
+}
+
+fun getLink(subject: Subject?): String {
+    return when(subject?.category) {
+        "Physics" -> "https://wppt.pwr.edu.pl/studenci/karty-przedmiotow-poza-wppt"
+        "Mathematics" -> "https://wmat.pwr.edu.pl/studenci/kursy-ogolnouczelniane/karty-przedmiotow/karty-przedmiotow-ogolnouczelnianych/studia-stacjonarne"
+        "Foreign languages" -> "https://sjo.pwr.edu.pl/"
+        "Sporting classes" -> "https://swfis.pwr.edu.pl/"
+        else -> "https://wit.pwr.edu.pl/studenci/programy-studiow/2023-2024-studia-i-stopnia"
     }
 }
