@@ -18,8 +18,9 @@ class SubjectService: ViewModel() {
     var allBlocks by mutableStateOf<List<Block>>(listOf())
     var program by mutableStateOf<Program?>(null)
     var loading by mutableStateOf(false)
+    var semesterAmount by mutableStateOf(1)
     
-    suspend fun getAllSubjects(level: Int, field: String, cycle: String, specialization: Int) {
+    suspend fun getAllSubjects(level: Int, field: String, cycle: Int, specialization: String) {
         val blocks: MutableList<Block> = mutableListOf()
         val subjects: MutableList<Subject> = mutableListOf()
         val semesters: MutableList<List<Subject>> = mutableListOf()
@@ -28,24 +29,31 @@ class SubjectService: ViewModel() {
 
         val program: List<Program> = httpClient
             .getHttpClient()
-//            .get(_url + "list-subjects/$level/$field/$cycle/$specialization")
-            .get(_url + "list-subjects/1/Informatyka_Stosowana/2023/")
+            .get(
+                if(specialization == "") {
+                    _url + "list-subjects/$level/$field/$cycle/"
+                } else {
+                    _url + "list-subjects/$level/$field/$cycle/$specialization/"
+                }
+            )
             .body()
 
-        semesters.add(program[0].semester1)
-        semesters.add(program[0].semester2)
-        semesters.add(program[0].semester3)
-        semesters.add(program[0].semester4)
-        semesters.add(program[0].semester5)
-        semesters.add(program[0].semester6)
-        semesters.add(program[0].semester7)
+        program[0].semester1?.let { semesters.add(it) }
+        program[0].semester2?.let { semesters.add(it) }
+        program[0].semester3?.let { semesters.add(it) }
+        program[0].semester4?.let { semesters.add(it) }
+        program[0].semester5?.let { semesters.add(it) }
+        program[0].semester6?.let { semesters.add(it) }
+        program[0].semester7?.let { semesters.add(it) }
+
+        semesterAmount = semesters.size + 1
 
         var semesterId = 1
         for (semester in semesters) {
             for (subject in semester) {
                 subjects.add(subject)
                 val tempBlock = blocks.find { it.name == subject.module }
-                // jezeli w liscie blokow znajduje sie juz blok o danej nazwie to nalezy dodac ten przedmiot do listy przedmiotow w bloku
+
                 if(tempBlock == null) {
                     blocks.add(Block(name = subject.module ?: subject.name, block_type = subject.category, ects = subject.ects, exam = if(subject.hasExam) "E" else "", hours = subject.hours, subjects = mutableListOf(subject), semester = semesterId))
                 } else {

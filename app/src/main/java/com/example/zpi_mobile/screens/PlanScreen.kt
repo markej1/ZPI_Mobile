@@ -4,6 +4,7 @@ package com.example.zpi_mobile.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -66,15 +67,28 @@ fun PlanScreen(
     var allBlocks by remember { mutableStateOf(listOf<Block>()) }
 
     var blurPower by remember { mutableStateOf(0)}
+    val context = LocalContext.current
 
+    var semesterAmount by remember { mutableStateOf(subjectService.semesterAmount) }
 
     LaunchedEffect(Unit) {
         if(allSubjects.isEmpty()) {
             Log.d("dziala", "get all subjects...")
-            subjectService.getAllSubjects(1, "s", "s", 1)
+            subjectService.getAllSubjects(
+                level = if(SharedPreferencesManager(context).getData("level", "") === "I stopień") 1 else 2,
+                field = SharedPreferencesManager(context).getData("field", ""),
+                cycle = 2023,
+                specialization = SharedPreferencesManager(context).getData("specialization", "")
+            )
             allSubjects = subjectService.allSubjects
             allBlocks = subjectService.allBlocks
+            semesterAmount = subjectService.semesterAmount
         }
+    }
+
+    BackHandler {
+        subjectService.allSubjects = listOf()
+        navController.navigateUp()
     }
 
     Scaffold(
@@ -141,14 +155,14 @@ fun PlanScreen(
                         style = MaterialTheme.typography.bodyLarge
                     )
                     IconButton(
-                        enabled = pagerState.currentPage != semesters.size - 1,
+                        enabled = pagerState.currentPage != semesterAmount - 1,
                         onClick = {
                             scope.launch {
                                 pagerState.scrollToPage(pagerState.currentPage + 1)
                             }
                         }
                     ) {
-                        if (pagerState.currentPage != semesters.size - 1) {
+                        if (pagerState.currentPage != semesterAmount - 1) {
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowRight,
                                 contentDescription = "right"
@@ -163,15 +177,9 @@ fun PlanScreen(
                 if (subjectService.isDialogShown) {
                     SubjectSelect(subjectService, navController, scope)
                 }
-                if (subjectService.loading) {
-                    blurPower = 10
-                    CircularProgressIndicator(
-                        color = StatusBarColor,
-                        modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center).zIndex(1000.0f)
-                    )
-                }
+
                 HorizontalPager(
-                    count = semesters.size,
+                    count = semesterAmount,
                     state = pagerState,
                     verticalAlignment = Alignment.Top,
                     modifier = Modifier
@@ -179,10 +187,18 @@ fun PlanScreen(
                         .fillMaxSize()
                 ) { semester ->
                     when (semester) {
-                        0 -> PlanViewAll(subjectService, navController)
+                        0 -> PlanViewAll(subjectService, navController, scope)
                         else -> PlanViewSemester(subjectService, navController, semester, scope)
 
                     }
+                }
+
+                if (subjectService.loading) {
+                    blurPower = 10
+                    CircularProgressIndicator(
+                        color = StatusBarColor,
+                        modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center).zIndex(1000.0f)
+                    )
                 }
             }
         }
@@ -319,7 +335,8 @@ fun PlanViewSemester(
 @Composable
 fun PlanViewAll(
     subjectService: SubjectService,
-    navController: NavController
+    navController: NavController,
+    scope: CoroutineScope
 ) {
     val blocks: List<Block> = subjectService.allBlocks
     Box(contentAlignment = Alignment.TopCenter) {
@@ -336,7 +353,12 @@ fun PlanViewAll(
                             val subject = subjectService.getSubjectByName(blocks[index].subjects[0].name, blocks[index])
                             if (subject != null) {
                                 subjectService.chooseSubject(subject)
-                                navController.navigate("subject_card_screen")
+                                scope.launch {
+                                    if(subject.lecture == null && subject.classes == null && subject.laboratory == null && subject.seminar == null && subject.project == null) {
+                                        subjectService.getSubjectDetails()
+                                    }
+                                    navController.navigate("subject_card_screen")
+                                }
                             }
                         }
                               },

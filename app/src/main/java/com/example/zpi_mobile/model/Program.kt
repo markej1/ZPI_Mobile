@@ -21,11 +21,11 @@ import kotlinx.serialization.Serializable
 //}
 @Serializable
 data class Program (
-    @SerialName("1") val semester1: List<Subject>,
-    @SerialName("2") val semester2: List<Subject>,
-    @SerialName("3") val semester3: List<Subject>,
-    @SerialName("4") val semester4: List<Subject>,
-    @SerialName("5") val semester5: List<Subject>,
-    @SerialName("6") val semester6: List<Subject>,
-    @SerialName("7") val semester7: List<Subject>
+    @SerialName("1") val semester1: List<Subject>? = null,
+    @SerialName("2") val semester2: List<Subject>? = null,
+    @SerialName("3") val semester3: List<Subject>? = null,
+    @SerialName("4") val semester4: List<Subject>? = null,
+    @SerialName("5") val semester5: List<Subject>? = null,
+    @SerialName("6") val semester6: List<Subject>? = null,
+    @SerialName("7") val semester7: List<Subject>? = null
 )
