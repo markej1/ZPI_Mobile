@@ -1,17 +1,13 @@
-package com.example.zpi_mobile.services
+package com.example.zpi_mobile.http.receive
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
+import com.example.zpi_mobile.http.KtorHttpClient
 import com.example.zpi_mobile.model.*
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.Json.Default.encodeToString
 
 class SubjectService: ViewModel() {
 

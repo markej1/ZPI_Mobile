@@ -5,7 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.zpi_mobile.screens.*
-import com.example.zpi_mobile.services.SubjectService
+import com.example.zpi_mobile.http.receive.SubjectService
 
 @Composable
 fun Navigation(

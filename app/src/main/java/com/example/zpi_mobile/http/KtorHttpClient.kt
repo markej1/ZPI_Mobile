@@ -1,4 +1,4 @@
-package com.example.zpi_mobile.services
+package com.example.zpi_mobile.http
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
