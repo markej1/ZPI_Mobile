@@ -11,6 +11,7 @@ interface IBlock {
     val subjects: MutableList<Subject>
     var semester: Int?
 }
+
 @Serializable
 data class Block(
     override val name: String,

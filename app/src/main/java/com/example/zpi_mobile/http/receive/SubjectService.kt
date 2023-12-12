@@ -18,8 +18,7 @@ class SubjectService: ViewModel() {
     var allBlocks by mutableStateOf<List<Block>>(listOf())
     var program by mutableStateOf<Program?>(null)
     var loading by mutableStateOf(false)
-
-    fun getBlocks(): List<Block> {return listOf()}
+    
     suspend fun getAllSubjects(level: Int, field: String, cycle: String, specialization: Int) {
         val blocks: MutableList<Block> = mutableListOf()
         val subjects: MutableList<Subject> = mutableListOf()
@@ -96,6 +95,7 @@ class SubjectService: ViewModel() {
             if (block.semester == semester) resultBlock.add(block)
         }
         return resultBlock.sortedBy { block -> block.name }
+
     }
 
     var isDialogShown by mutableStateOf(false)

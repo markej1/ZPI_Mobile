@@ -8,6 +8,7 @@ import kotlinx.serialization.json.Json
 
 
 class KtorHttpClient {
+  
     private val httpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json {
@@ -20,6 +21,5 @@ class KtorHttpClient {
     fun getHttpClient(): HttpClient {
         return httpClient
     }
-
 
 }

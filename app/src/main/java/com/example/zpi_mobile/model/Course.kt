@@ -1,5 +1,6 @@
 package com.example.zpi_mobile.model
 
+
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 @Serializable
@@ -18,6 +19,7 @@ sealed class ICourse {
     abstract val type: String
     @SerialName("detalis") abstract val details: CourseDetails
 }
+
 @Serializable
 @SerialName("Lecture")
 data class Lecture(
