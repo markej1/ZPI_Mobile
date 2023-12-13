@@ -66,7 +66,6 @@ fun PlanScreen(
     var allSubjects by remember { mutableStateOf(subjectService.allSubjects) }
     var allBlocks by remember { mutableStateOf(listOf<Block>()) }
 
-    var blurPower by remember { mutableStateOf(0)}
     val context = LocalContext.current
 
     var semesterAmount by remember { mutableStateOf(subjectService.semesterAmount) }
@@ -171,9 +170,7 @@ fun PlanScreen(
                     }
                 }
             }
-            Box(
-                modifier = Modifier.blur(blurPower.dp)
-            ) {
+            Box {
                 if (subjectService.isDialogShown) {
                     SubjectSelect(subjectService, navController, scope)
                 }
@@ -194,7 +191,6 @@ fun PlanScreen(
                 }
 
                 if (subjectService.loading) {
-                    blurPower = 10
                     CircularProgressIndicator(
                         color = StatusBarColor,
                         modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center).zIndex(1000.0f)
@@ -341,7 +337,7 @@ fun PlanViewAll(
     val blocks: List<Block> = subjectService.allBlocks
     Box(contentAlignment = Alignment.TopCenter) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 128.dp),
+            columns = GridCells.Adaptive(minSize = 150.dp),
         ) {
             items(blocks.size) { index ->
                 Card(
@@ -382,7 +378,7 @@ fun PlanViewAll(
                             maxLines = 4,
                             modifier = Modifier.padding(8.dp),
                             textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
                 }
