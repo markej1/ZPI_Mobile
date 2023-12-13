@@ -67,12 +67,18 @@ class SubjectService: ViewModel() {
         loading = false
     }
 
-    suspend fun getSubjectDetails() {
+    suspend fun getSubjectDetails(level: Int, field: String, cycle: Int, specialization: String) {
         loading = true
 
         val courses: List<ICourse> = httpClient
             .getHttpClient()
-            .get(_url + "desc/1/Informatyka_Stosowana/2023/${chosenSubject?.moduleId}/${chosenSubject?.subjectId}")
+            .get(
+                if(specialization == "") {
+                    _url + "desc/$level/$field/$cycle/${chosenSubject?.moduleId}/${chosenSubject?.subjectId}/"
+                } else {
+                    _url + "desc/$level/$field/$cycle/${chosenSubject?.moduleId}/${chosenSubject?.subjectId}/$specialization/"
+                }
+            )
             .body()
 
         for (course in courses) {

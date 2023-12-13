@@ -60,12 +60,12 @@ fun SubjectCardScreen(
         )
         LazyColumn {
             items(1) {
-                ListItem("Wykład", subjectService.chosenSubject?.lecture, textStyle)
-                ListItem("Ćwiczenia", subjectService.chosenSubject?.classes, textStyle)
-                ListItem("Laboratorium", subjectService.chosenSubject?.laboratory, textStyle)
-                ListItem("Seminarium", subjectService.chosenSubject?.seminar, textStyle)
-                ListItem("Projekt", subjectService.chosenSubject?.project, textStyle)
-                ProgrammeContent(programmeContent = subjectService.chosenSubject?.curriculumContent, textStyle)
+                if(subjectService.chosenSubject?.lecture != null) ListItem("Wykład", subjectService.chosenSubject?.lecture, textStyle)
+                if(subjectService.chosenSubject?.classes != null) ListItem("Ćwiczenia", subjectService.chosenSubject?.classes, textStyle)
+                if(subjectService.chosenSubject?.laboratory != null) ListItem("Laboratorium", subjectService.chosenSubject?.laboratory, textStyle)
+                if(subjectService.chosenSubject?.seminar != null) ListItem("Seminarium", subjectService.chosenSubject?.seminar, textStyle)
+                if(subjectService.chosenSubject?.project != null) ListItem("Projekt", subjectService.chosenSubject?.project, textStyle)
+                if(subjectService.chosenSubject?.curriculumContent?.isEmpty() == false) ProgrammeContent(programmeContent = subjectService.chosenSubject?.curriculumContent, textStyle)
                 Link(getLink(subjectService.chosenSubject), textStyle)
             }
         }
@@ -78,7 +78,7 @@ fun ListItem(
     course: CourseDetails?,
     textStyle: TextStyle
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(true) }
 
     ElevatedCard(
         onClick = { expanded = !expanded },
