@@ -18,6 +18,7 @@ interface ISubject {
     var project: CourseDetails?
     val hours: String
     val ects: Int
+    val ectsString: String?
     val hasExam: Boolean
 }
 
@@ -38,6 +39,7 @@ data class Subject(
     override var project: CourseDetails? = null,
     override val hours: String,
     override val ects: Int,
+    override val ectsString: String? = null,
     override val hasExam: Boolean,
     ): ISubject
 
