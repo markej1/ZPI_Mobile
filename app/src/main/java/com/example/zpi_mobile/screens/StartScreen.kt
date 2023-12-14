@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -27,8 +26,8 @@ import androidx.navigation.NavController
 import com.example.zpi_mobile.R
 import com.example.zpi_mobile.SharedPreferencesManager
 import com.example.zpi_mobile.http.receive.StartService
-import com.example.zpi_mobile.model.Level
 import com.example.zpi_mobile.navigation.Screen
+import com.example.zpi_mobile.repo.StartInformation
 import com.example.zpi_mobile.ui.theme.StartBackgroundColor
 import com.example.zpi_mobile.ui.theme.StatusBarColor
 import kotlinx.coroutines.launch
@@ -60,6 +59,8 @@ fun StartScreen(navController: NavController) {
 
     val loading = startService.loading
     var blurPower: Int
+
+    val startInformation = StartInformation()
 
     Scaffold(
         content = {
@@ -112,7 +113,7 @@ fun StartScreen(navController: NavController) {
                                     onValueChanged = {
                                         scope.launch {
                                             try {
-                                                levelNumber = getLevelInt(
+                                                levelNumber = startInformation.getLevelInt(
                                                     sharedPreferencesManager = sharedPreferencesManager,
                                                     levels = levels
                                                 )
@@ -147,7 +148,8 @@ fun StartScreen(navController: NavController) {
                                                     field = sharedPreferencesManager
                                                         .getData("field", "")
                                                 )
-                                                cyclesDisplay = getDisplayedCycles(cycles)
+                                                cyclesDisplay =
+                                                    startInformation.getDisplayedCycles(cycles)
                                                 visible3 = true
                                                 visible4 = false
                                                 sharedPreferencesManager.saveData("cycle", "")
@@ -175,7 +177,7 @@ fun StartScreen(navController: NavController) {
                                                     level = levelNumber,
                                                     field = sharedPreferencesManager
                                                         .getData("field", ""),
-                                                    cycle = makeCycleInt(
+                                                    cycle = startInformation.makeCycleInt(
                                                         sharedPreferencesManager
                                                             .getData("cycle", "")
                                                     )
@@ -289,28 +291,4 @@ fun StartProgramChoice(
         }
 
     }
-}
-
-fun getLevelInt(sharedPreferencesManager: SharedPreferencesManager, levels: List<Level>): Int {
-    val levelName = sharedPreferencesManager.getData("level", "")
-    for (level in levels) {
-        if (levelName == level.levelName) {
-            return level.number
-        }
-    }
-    return -1
-}
-
-fun getDisplayedCycles(cyclesInt: SnapshotStateList<Int>): SnapshotStateList<String> {
-    val displayCyclesList = mutableStateListOf<String>()
-    for (cycle in cyclesInt) {
-        var cycleText = cycle.toString()
-        cycleText += "/${cycle + 1}"
-        displayCyclesList.add(cycleText)
-    }
-    return displayCyclesList
-}
-
-fun makeCycleInt(cycle: String): Int {
-    return Integer.parseInt(cycle.split("/")[0])
 }

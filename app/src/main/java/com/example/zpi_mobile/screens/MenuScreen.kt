@@ -7,13 +7,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,13 +15,16 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.zpi_mobile.SharedPreferencesManager
+import com.example.zpi_mobile.http.receive.MenuService
+import com.example.zpi_mobile.http.receive.StartService
+import com.example.zpi_mobile.model.ChosenProgram
 import com.example.zpi_mobile.navigation.Screen
+import com.example.zpi_mobile.repo.StartInformation
 import com.example.zpi_mobile.ui.theme.StatusBarColor
-import java.util.logging.Level
+import kotlinx.coroutines.launch
 
 val rowArrangement = Arrangement.SpaceBetween
 val paddingHorizontal = 20.dp
@@ -47,6 +44,51 @@ fun MenuScreen(navController: NavController) {
     var orientation by remember { mutableStateOf(Configuration.ORIENTATION_PORTRAIT) }
     val configuration = LocalConfiguration.current
 
+    val menuService = MenuService()
+    val scope = rememberCoroutineScope()
+    var chosenProgram by remember {
+        mutableStateOf(
+            ChosenProgram("", "Próba", false, false, "", true)
+        )
+    }
+    var educationLevel by remember { mutableStateOf("") }
+    var isFullTime by remember { mutableStateOf(false) }
+    var isGeneralAcademic by remember { mutableStateOf(false) }
+    var language by remember { mutableStateOf("") }
+    var inPolish by remember { mutableStateOf(true) }
+
+    val startInformation = StartInformation()
+    val startService = StartService()
+    val levels = startService.getLevels()
+
+    LaunchedEffect(true) {
+        scope.launch {
+            try {
+                val chosenProgramGet = if (specialization == "") {
+                    menuService.getChosenProgram(
+                        level = startInformation.getLevelInt(sharedPreferencesManager, levels),
+                        field = startInformation.improveText(field),
+                        cycle = startInformation.makeCycleInt(cycle)
+                    )
+                } else {
+                    menuService.getChosenProgramSpecialization(
+                        level = Integer.parseInt(level),
+                        field = field,
+                        cycle = Integer.parseInt(cycle),
+                        specialization = specialization
+                    )
+                }
+                chosenProgram = chosenProgramGet
+                educationLevel = chosenProgram.education_level
+                isFullTime = chosenProgram.is_full_time
+                isGeneralAcademic = chosenProgram.is_general_academic
+                language = chosenProgram.language
+                inPolish = chosenProgram.inPolish
+            } catch (_: Exception) {
+            }
+        }
+    }
+
     LaunchedEffect(configuration) {
         snapshotFlow { configuration.orientation }
             .collect { orientation = it }
@@ -62,16 +104,21 @@ fun MenuScreen(navController: NavController) {
                         textAlign = TextAlign.Center
                     )
                 },
-//                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xff0f9d58)),
             )
         },
         content = {
             when (orientation) {
                 Configuration.ORIENTATION_LANDSCAPE -> {
-                    LandscapeContent(infoArrangement, level, cycle, specialization, navController)
+                    LandscapeContent(
+                        infoArrangement, level, cycle, specialization, navController,
+                        educationLevel, isFullTime, isGeneralAcademic, language, inPolish
+                    )
                 }
                 else -> {
-                    PortraitContent(infoArrangement, level, cycle, specialization, navController)
+                    PortraitContent(
+                        infoArrangement, level, cycle, specialization, navController,
+                        educationLevel, isFullTime, isGeneralAcademic, language, inPolish
+                    )
                 }
             }
         }
@@ -110,10 +157,17 @@ fun LandscapeContent(
     level: String,
     cycle: String,
     specialization: String,
-    navController: NavController
+    navController: NavController,
+    educationLevel: String,
+    isFullTime: Boolean,
+    isGeneralAcademic: Boolean,
+    language: String,
+    inPolish: Boolean
 ) {
     Box(
-        modifier = Modifier.fillMaxWidth().wrapContentWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentWidth(),
         contentAlignment = Alignment.TopCenter
 //        horizontalAlignment = Alignment.CenterHorizontally,
 //        verticalArrangement = Arrangement.SpaceAround
@@ -127,10 +181,10 @@ fun LandscapeContent(
                     if (specialization != "") {
                         RowInformation(text = "Specjalność:", answer = specialization)
                     }
-                    RowInformation(text = "Profil:", answer = "ogólnoakademicki")
-                    RowInformation(text = "Poziom studiów:", answer = "pierwszy")
-                    RowInformation(text = "Forma studiów:", answer = "stacjonarna")
-                    RowInformation(text = "Język studiów:", answer = "polski")
+                    RowInformation(text = "Profil:", answer = getIsGeneralAcademic(isGeneralAcademic, inPolish))
+                    RowInformation(text = "Poziom studiów:", answer = getEducationLevel(educationLevel, inPolish))
+                    RowInformation(text = "Forma studiów:", answer = getIsFullTime(isFullTime, inPolish))
+                    RowInformation(text = "Język studiów:", answer = language)
                 }
             }
             Button(
@@ -154,10 +208,17 @@ fun PortraitContent(
     level: String,
     cycle: String,
     specialization: String,
-    navController: NavController
+    navController: NavController,
+    educationLevel: String,
+    isFullTime: Boolean,
+    isGeneralAcademic: Boolean,
+    language: String,
+    inPolish: Boolean
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(top = paddingHorizontal),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = paddingHorizontal),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround
     ) {
@@ -167,10 +228,10 @@ fun PortraitContent(
             if (specialization != "") {
                 ColumnInformation(text = "Specjalność:", answer = specialization)
             }
-            ColumnInformation(text = "Profil:", answer = "ogólnoakademicki")
-            ColumnInformation(text = "Poziom studiów:", answer = "pierwszy")
-            ColumnInformation(text = "Forma studiów:", answer = "stacjonarna")
-            ColumnInformation(text = "Język studiów:", answer = "polski")
+            ColumnInformation(text = "Profil:", answer = getIsGeneralAcademic(isGeneralAcademic, inPolish))
+            ColumnInformation(text = "Poziom studiów:", answer = getEducationLevel(educationLevel, inPolish))
+            ColumnInformation(text = "Forma studiów:", answer = getIsFullTime(isFullTime, inPolish))
+            ColumnInformation(text = "Język studiów:", answer = language)
         }
         Button(
             onClick = {
@@ -182,6 +243,72 @@ fun PortraitContent(
                 text = "Plan studiów",
                 style = MaterialTheme.typography.titleSmall
             )
+        }
+    }
+}
+
+fun getEducationLevel(educationLevel: String, inPolish: Boolean): String {
+    when (educationLevel) {
+        "First-level (inżynier) studies" -> {
+            return if (inPolish) {
+                "studia pierwszego stopnia (inżynierskie)"
+            } else {
+                "first-level (inżynier) studies"
+            }
+        }
+        "First-level (licencjat) studies" -> {
+            return if (inPolish) {
+                "studia pierwszego stopnia (licencjackie)"
+            } else {
+                "first-level (licencjat) studies"
+            }
+        }
+        "Second-level studies" -> {
+            return if (inPolish) {
+                "studia drugiego stopnia"
+            } else {
+                "second-level studies"
+            }
+        }
+        "Magister uniform studies" -> {
+            return if (inPolish) {
+                "jednolite studia magisterskie"
+            } else {
+                "magister uniform studies"
+            }
+        }
+    }
+    return ""
+}
+
+fun getIsFullTime(isFullTime: Boolean, inPolish: Boolean): String {
+    return if (isFullTime) {
+        if (inPolish) {
+            "stacjonarna";
+        } else {
+            "full-time studies"
+        }
+    } else {
+        if (inPolish) {
+            "niestacjonarna";
+        } else {
+            "part-time studies"
+        }
+    }
+}
+
+fun getIsGeneralAcademic(isGeneralAcademic: Boolean, inPolish: Boolean): String {
+    return if (isGeneralAcademic) {
+        if (inPolish) {
+            "ogólnoakademicki";
+        } else {
+            "general academic"
+        }
+    } else {
+        if (inPolish) {
+            "praktyczny";
+        } else {
+            "practical"
         }
     }
 }
