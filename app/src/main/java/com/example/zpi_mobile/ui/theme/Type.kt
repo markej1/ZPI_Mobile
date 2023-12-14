@@ -28,6 +28,13 @@ val Typography = Typography(
         lineHeight = 16.sp,
         letterSpacing = 0.3.sp
     ),
+    labelSmall = TextStyle(
+        fontFamily = Alata,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 14.sp,
+        letterSpacing = 0.3.sp
+    ),
     titleLarge = TextStyle(
         fontFamily = Jura,
         fontWeight = FontWeight.SemiBold,

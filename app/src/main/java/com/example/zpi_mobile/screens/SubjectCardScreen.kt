@@ -3,6 +3,7 @@
 
 package com.example.zpi_mobile.screens
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.zpi_mobile.SharedPreferencesManager
 import com.example.zpi_mobile.model.CourseDetails
 import com.example.zpi_mobile.http.receive.SubjectService
 import com.example.zpi_mobile.model.Subject
@@ -43,6 +45,7 @@ fun SubjectCardScreen(
     navController: NavController
 ) {
     val textStyle = MaterialTheme.typography.bodySmall
+    val context = LocalContext.current
     Column {
         SmallTopAppBar(
             title = { Text(
@@ -60,13 +63,13 @@ fun SubjectCardScreen(
         )
         LazyColumn {
             items(1) {
-                ListItem("Wykład", subjectService.chosenSubject?.lecture, textStyle)
-                ListItem("Ćwiczenia", subjectService.chosenSubject?.classes, textStyle)
-                ListItem("Laboratorium", subjectService.chosenSubject?.laboratory, textStyle)
-                ListItem("Seminarium", subjectService.chosenSubject?.seminar, textStyle)
-                ListItem("Projekt", subjectService.chosenSubject?.project, textStyle)
-                ProgrammeContent(programmeContent = subjectService.chosenSubject?.curriculumContent, textStyle)
-                Link(getLink(subjectService.chosenSubject), textStyle)
+                if(subjectService.chosenSubject?.lecture != null) ListItem("Wykład", subjectService.chosenSubject?.lecture, textStyle)
+                if(subjectService.chosenSubject?.classes != null) ListItem("Ćwiczenia", subjectService.chosenSubject?.classes, textStyle)
+                if(subjectService.chosenSubject?.laboratory != null) ListItem("Laboratorium", subjectService.chosenSubject?.laboratory, textStyle)
+                if(subjectService.chosenSubject?.seminar != null) ListItem("Seminarium", subjectService.chosenSubject?.seminar, textStyle)
+                if(subjectService.chosenSubject?.project != null) ListItem("Projekt", subjectService.chosenSubject?.project, textStyle)
+                if(subjectService.chosenSubject?.curriculumContent?.isEmpty() == false) ProgrammeContent(programmeContent = subjectService.chosenSubject?.curriculumContent, textStyle)
+                Link(getLink(subjectService.chosenSubject, context), textStyle)
             }
         }
     }
@@ -78,7 +81,7 @@ fun ListItem(
     course: CourseDetails?,
     textStyle: TextStyle
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(true) }
 
     ElevatedCard(
         onClick = { expanded = !expanded },
@@ -186,12 +189,20 @@ fun Link(
     }
 }
 
-fun getLink(subject: Subject?): String {
+fun getLink(subject: Subject?, context: Context): String {
     return when(subject?.category) {
         "Physics" -> "https://wppt.pwr.edu.pl/studenci/karty-przedmiotow-poza-wppt"
         "Mathematics" -> "https://wmat.pwr.edu.pl/studenci/kursy-ogolnouczelniane/karty-przedmiotow/karty-przedmiotow-ogolnouczelnianych/studia-stacjonarne"
         "Foreign languages" -> "https://sjo.pwr.edu.pl/"
         "Sporting classes" -> "https://swfis.pwr.edu.pl/"
-        else -> "https://wit.pwr.edu.pl/studenci/programy-studiow/2023-2024-studia-i-stopnia"
+        else -> "https://wit.pwr.edu.pl/studenci/programy-studiow/${getCycle(context)}-studia-${getLevel(context)}-stopnia"
     }
+}
+
+fun getLevel(context: Context): String {
+    return if(SharedPreferencesManager(context).getData("level", "") === "I stopień") "i"
+    else "ii"
+}
+fun getCycle(context: Context): String {
+    return SharedPreferencesManager(context).getData("cycle", "").split("/").joinToString("-")
 }

@@ -66,7 +66,6 @@ fun PlanScreen(
     var allSubjects by remember { mutableStateOf(subjectService.allSubjects) }
     var allBlocks by remember { mutableStateOf(listOf<Block>()) }
 
-    var blurPower by remember { mutableStateOf(0)}
     val context = LocalContext.current
 
     var semesterAmount by remember { mutableStateOf(subjectService.semesterAmount) }
@@ -171,9 +170,7 @@ fun PlanScreen(
                     }
                 }
             }
-            Box(
-                modifier = Modifier.blur(blurPower.dp)
-            ) {
+            Box {
                 if (subjectService.isDialogShown) {
                     SubjectSelect(subjectService, navController, scope)
                 }
@@ -194,7 +191,6 @@ fun PlanScreen(
                 }
 
                 if (subjectService.loading) {
-                    blurPower = 10
                     CircularProgressIndicator(
                         color = StatusBarColor,
                         modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center).zIndex(1000.0f)
@@ -218,6 +214,7 @@ fun SubjectTile(
     val textStyleBody = MaterialTheme.typography.bodySmall
     var textStyle by remember { mutableStateOf(textStyleBody) }
     var readyToDraw by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     Card(
         onClick = {
             subjectService.chooseBlock(block)
@@ -229,7 +226,12 @@ fun SubjectTile(
                     subjectService.chooseSubject(subject)
                     scope.launch {
                         if(subject.lecture == null && subject.classes == null && subject.laboratory == null && subject.seminar == null && subject.project == null) {
-                            subjectService.getSubjectDetails()
+                            subjectService.getSubjectDetails(
+                                level = if(SharedPreferencesManager(context).getData("level", "") === "I stopień") 1 else 2,
+                                field = SharedPreferencesManager(context).getData("field", ""),
+                                cycle = 2023,
+                                specialization = SharedPreferencesManager(context).getData("specialization", "")
+                            )
                         }
 //                        subjectService.getSubjectDetails()
                         navController.navigate("subject_card_screen")
@@ -339,9 +341,10 @@ fun PlanViewAll(
     scope: CoroutineScope
 ) {
     val blocks: List<Block> = subjectService.allBlocks
+    val context = LocalContext.current
     Box(contentAlignment = Alignment.TopCenter) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 128.dp),
+            columns = GridCells.Adaptive(minSize = 150.dp),
         ) {
             items(blocks.size) { index ->
                 Card(
@@ -355,7 +358,12 @@ fun PlanViewAll(
                                 subjectService.chooseSubject(subject)
                                 scope.launch {
                                     if(subject.lecture == null && subject.classes == null && subject.laboratory == null && subject.seminar == null && subject.project == null) {
-                                        subjectService.getSubjectDetails()
+                                        subjectService.getSubjectDetails(
+                                            level = if(SharedPreferencesManager(context).getData("level", "") === "I stopień") 1 else 2,
+                                            field = SharedPreferencesManager(context).getData("field", ""),
+                                            cycle = 2023,
+                                            specialization = SharedPreferencesManager(context).getData("specialization", "")
+                                        )
                                     }
                                     navController.navigate("subject_card_screen")
                                 }
@@ -382,7 +390,7 @@ fun PlanViewAll(
                             maxLines = 4,
                             modifier = Modifier.padding(8.dp),
                             textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
                 }
@@ -423,7 +431,7 @@ fun SubjectSelect(
 fun cardColor(type: String, isBlock: Boolean): Color {
     return when (Pair(type, isBlock)) {
         Pair("Field Of Study", false) -> przedmiotKierunkowy
-        Pair("przedmiot specjalnościowy", false) -> przedmiotSpecjalnosciowy
+        Pair("Specialization", false) -> przedmiotSpecjalnosciowy
         Pair("Physics", false) -> przedmiotNaukPodstawowych
         Pair("Mathematics", false) -> przedmiotNaukPodstawowych
         Pair("Basic science", false) -> przedmiotNaukPodstawowych
@@ -434,7 +442,7 @@ fun cardColor(type: String, isBlock: Boolean): Color {
         Pair("Sporting classes" , false) -> przedmiotKsztalceniaOgolnego
 
         Pair("Field Of Study", true) -> blokKierunkowy
-        Pair("przedmiot specjalnościowy", true) -> blokSpecjalnosciowy
+        Pair("Specialization", true) -> blokSpecjalnosciowy
         Pair("Physics", true) -> blokNaukPodstawowych
         Pair("Mathematics", true) -> blokNaukPodstawowych
         Pair("Basic science", true) -> blokNaukPodstawowych
