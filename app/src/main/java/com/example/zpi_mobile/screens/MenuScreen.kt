@@ -72,10 +72,10 @@ fun MenuScreen(navController: NavController) {
                     )
                 } else {
                     menuService.getChosenProgramSpecialization(
-                        level = Integer.parseInt(level),
-                        field = field,
-                        cycle = Integer.parseInt(cycle),
-                        specialization = specialization
+                        level = startInformation.getLevelInt(sharedPreferencesManager, levels),
+                        field = startInformation.improveText(field),
+                        cycle = startInformation.makeCycleInt(cycle),
+                        specialization = startInformation.improveText(specialization)
                     )
                 }
                 chosenProgram = chosenProgramGet
